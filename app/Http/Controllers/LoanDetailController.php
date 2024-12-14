@@ -60,6 +60,7 @@ class LoanDetailController extends Controller
         $processingFee = $request->processing_fee;
         $interestRate = $request->interest_rate;
         $date = $request->date;
+        $remainingAmount = 0;
         if($request->loan_type == 'tenure'){
             $tenure = $request->tenure;
             // Loan Interest Calculation
