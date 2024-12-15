@@ -17,4 +17,15 @@ class LoanDetail extends Model
     public function emiDetail(){
         return $this->hasMany(EmiDetail::class);
     }
+
+    protected $fillable = [
+        'provider',
+        'amount',
+        'emi_amount',
+        'processing_fee',
+        'interest_rate',
+        'emi_count',
+        'disbursed_date',
+        'status',
+    ];
 }

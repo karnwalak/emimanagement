@@ -61,6 +61,15 @@ class EmiDetailController extends Controller
         return;
     }
 
+    public function updateEmi(Request $request){
+        $updateEmi = EmiDetail::upsert($request->emi_details,['id'],['amount','due_date']);
+        if($updateEmi){
+            $updatedEmi = EmiDetail::where('loan_detail_id',$request->loan_detail_id)->select('id', 'loan_detail_id', 'amount', 'due_date')->get();
+            return response()->json(['status'=>true,'message'=>'Emi details are updated!','updatedEmi'=>$updatedEmi]);
+        }
+
+    }
+
     /**
      * Remove the specified resource from storage.
      */

@@ -22,13 +22,12 @@ class LoanDetailRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "user" =>['required','not_in:0'],
             "provider" =>['required'],
             "amount" =>['required'],
             "processing_fee" =>['required'],
             "interest_rate" =>['required','numeric','min:0','max:100'],
-            "tenure" => ['nullable', 'integer', 'required_without:emi_amount'], // Required if emi_amount is not provided
-            "emi_amount" => ['nullable', 'required_without:tenure'], // Required if tenure is not provided
+            "tenure" => ['nullable', 'integer', 'required_without:emi_amount'],
+            "emi_amount" => ['nullable', 'required_without:tenure'],
             "date" =>['required','date'],
         ];
     }

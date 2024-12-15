@@ -32,6 +32,8 @@ export default function Dashboard({ loanDetails }) {
                                         <th>SI. No</th>
                                         <th>Provider</th>
                                         <th>Amount</th>
+                                        <th>Processing Fee</th>
+                                        <th>Amount You Get</th>
                                         <th>Int.</th>
                                         <th>No. of EMI</th>
                                         <th>Paid EMI</th>
@@ -44,6 +46,11 @@ export default function Dashboard({ loanDetails }) {
                                             <td>{key + 1}.</td>
                                             <td>{loanDetail.provider}</td>
                                             <td>{loanDetail.amount}</td>
+                                            <td>{loanDetail.processing_fee}</td>
+                                            <td>
+                                                {loanDetail.amount -
+                                                    loanDetail.processing_fee}
+                                            </td>
                                             <td>{loanDetail.interest_rate}</td>
                                             <td>{loanDetail.emi_count}</td>
                                             <td>
@@ -58,10 +65,19 @@ export default function Dashboard({ loanDetails }) {
                                             <td className="p-2 flex">
                                                 <Link
                                                     href={route(
+                                                        "loan-detail.edit",
+                                                        loanDetail.id
+                                                    )}
+                                                    className="bg-green-500 uppercase hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <Link
+                                                    href={route(
                                                         "loan-detail.show",
                                                         loanDetail.id
                                                     )}
-                                                    className="bg-blue-500 uppercase hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                                                    className="bg-blue-500 mx-2 uppercase hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
                                                 >
                                                     Show
                                                 </Link>

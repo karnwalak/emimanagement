@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('/loan-detail', LoanDetailController::class);
     Route::resource('/emi-detail', EmiDetailController::class);
+    Route::post('/update-emi', [EmiDetailController::class,'updateEmi']);
 });
 
 require __DIR__.'/auth.php';

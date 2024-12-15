@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('loan_details', function (Blueprint $table) {
-            $table->renameColumn('interaste_rate','interest_rate');
+            $table->string('loan_type')->after('interest_rate')->nullable();
         });
     }
 

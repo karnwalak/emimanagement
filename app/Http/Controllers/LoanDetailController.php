@@ -89,6 +89,7 @@ class LoanDetailController extends Controller
         $loanDetail->amount = $amount;
         $loanDetail->emi_amount = round($emiAmount);
         $loanDetail->processing_fee = $processingFee;
+        $loanDetail->loan_type = $request->loan_type;
         $loanDetail->interest_rate = $interestRate;
         $loanDetail->emi_count = $emiCount + ($remainingAmount > 0 ? 1 : 0);
         $loanDetail->disbursed_date = $date;
@@ -133,21 +134,34 @@ class LoanDetailController extends Controller
         $user = $loanDetail->user;
         return inertia('Show', compact('user', 'loanDetail', 'emiDetail'));
     }
-
+    
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(LoanDetail $loanDetail)
     {
-        //
+        $emiDetail = $loanDetail->emiDetail->select('id','loan_detail_id', 'amount', 'due_date');
+        return inertia('Edit', compact('loanDetail', 'emiDetail'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, LoanDetail $loanDetail)
+    public function update(LoanDetailRequest $request, LoanDetail $loanDetail)
     {
-        //
+        $validatedData = $request->validated();
+        try {
+            // Update the loan detail with the validated data
+            $loanDetail->update($validatedData);
+
+            // Return a success response
+            return redirect()->back()->with('success',
+                'Loan details updated successfully!'
+            );
+        } catch (\Exception $e) {
+            // Handle exceptions
+            return redirect()->back()->with('error', 'An error occurred while updating loan details.');
+        }
     }
 
     /**
