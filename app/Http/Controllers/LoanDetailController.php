@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Inertia\Inertia;
 use App\Models\EmiDetail;
 use App\Models\LoanDetail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\LoanDetailRequest;
 use App\Http\Resources\LoanDetailResource;
-use Carbon\Carbon;
 
 class LoanDetailController extends Controller
 {
@@ -22,7 +23,7 @@ class LoanDetailController extends Controller
         // $loanDetail = LoanDetail::get();
         // return Inertia::render('LoanDetail',compact('loanDetail'));
 
-        $query = LoanDetail::query();
+        $query = LoanDetail::where('user_id',Auth::user()->id)->query();
         $sortField = request('sort_field','created_at');
         $sortDirection = request('sort_direction', 'desc');
         if(request('name')){
