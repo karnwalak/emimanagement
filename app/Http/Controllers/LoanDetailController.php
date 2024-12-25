@@ -23,7 +23,7 @@ class LoanDetailController extends Controller
         // $loanDetail = LoanDetail::get();
         // return Inertia::render('LoanDetail',compact('loanDetail'));
 
-        $query = LoanDetail::where('user_id',Auth::user()->id)->query();
+        $query = LoanDetail::where('user_id',Auth::user()->id);
         $sortField = request('sort_field','created_at');
         $sortDirection = request('sort_direction', 'desc');
         if(request('name')){
