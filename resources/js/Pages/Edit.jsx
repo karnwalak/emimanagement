@@ -137,6 +137,39 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
             }, 5000);
         }
     };
+
+    // Handle foreclose loan
+    const foreCloseLoan = async (loanId,event) => {
+        event.preventDefault(); // Prevent default form submission
+        const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
+        const response = await fetch(`/foreclose-loan`, {
+            method: "POST",
+            body: JSON.stringify({ loan_id: loanId }),
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+        });
+        const result = await response.json();
+        if (result.status === true) {
+            // Update the span with success message and classes
+            const successMessageSpan = document.getElementById("successMessage");
+            successMessageSpan.innerHTML =
+                "Loan foreclosed successfully!";
+            successMessageSpan.className =
+                "text-green-600 font-semibold mt-2";
+
+            // Remove the message after 5 seconds
+            setTimeout(() => {
+                successMessageSpan.innerHTML = "";
+                successMessageSpan.className = "";
+            }, 5000);
+        } else {
+            console.error("Error:", result.message);
+        }
+    };
     return (
         <AuthenticatedLayout
             header={
@@ -146,10 +179,16 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
             }
         >
             <Head title="Loan Detail" />
-
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
+                        <button
+                            type="button"
+                            onClick={() => foreCloseLoan(loanDetail.id,event)}
+                            className="bg-green-500 my-2 uppercase hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+                        >
+                            Foreclose Loan
+                        </button>
                         <form onSubmit={handleSubmit} method="post">
                             <div>
                                 <InputLabel

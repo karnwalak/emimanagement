@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('/loan-detail', LoanDetailController::class);
+    Route::post('/foreclose-loan', [LoanDetailController::class, 'forecloseLoan']);
     Route::resource('/emi-detail', EmiDetailController::class);
     Route::post('/update-emi', [EmiDetailController::class,'updateEmi']);
 });

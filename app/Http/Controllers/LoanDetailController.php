@@ -62,13 +62,26 @@ class LoanDetailController extends Controller
         $interestRate = $request->interest_rate;
         $date = $request->date;
         $remainingAmount = 0;
-        if($request->loan_type == 'tenure'){
-            $tenure = $request->tenure;
-            // Loan Interest Calculation
-            $interest = ($amount*$interestRate*($tenure/12))/100;
-            $totalAmount = $amount + $interest;
-            $emiAmount = $totalAmount/$tenure;
-            $emiCount = $tenure;
+        // if($request->loan_type == 'tenure'){
+        //     $tenure = $request->tenure;
+        //     // Loan Interest Calculation
+        //     $interest = ($amount*$interestRate*($tenure/12))/100;
+        //     $totalAmount = $amount + $interest;
+        //     $emiAmount = $totalAmount/$tenure;
+        //     $emiCount = $tenure;
+        // }
+
+        if ($request->loan_type == 'tenure') {
+            $tenure = $request->tenure; // in months
+            $annualInterestRate = $interestRate; // as % e.g. 10.5
+            $monthlyRate = $annualInterestRate / 12 / 100; // convert to monthly decimal
+
+            // EMI Formula
+            $emiAmount = ($amount * $monthlyRate * pow(1 + $monthlyRate, $tenure)) /
+                (pow(1 + $monthlyRate, $tenure) - 1);
+
+            $totalAmount = $emiAmount * $tenure; // Total repayment amount
+            $emiCount = $tenure; // Total number of EMIs
         }
 
         if($request->loan_type == 'emi_amount'){
@@ -175,5 +188,21 @@ class LoanDetailController extends Controller
             $loanDetail->delete();
         }
         return redirect()->route('loan-detail.index');
+    }
+
+    public function forecloseLoan(Request $request)
+    {
+        $loanDetail = LoanDetail::find($request->loan_id);
+        // dd($loanDetail);
+        if ($loanDetail) {
+            $emiDetails = EmiDetail::where('loan_detail_id', $loanDetail->id)
+            ->where('status', 'pending')
+            ->update(['status' => 'paid']);
+
+            $loanDetail->status = 'closed';
+            $loanDetail->save();
+        }
+
+        return response()->json(['status' => true, 'message' => 'Loan is foreclosed!']);
     }
 }

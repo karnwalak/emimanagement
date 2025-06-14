@@ -37,94 +37,99 @@ export default function Dashboard({ loanDetails }) {
                                         <th>Int.</th>
                                         <th>No. of EMI</th>
                                         <th>Paid EMI</th>
+                                        <th>Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {loanDetails.data.map((loanDetail, key) => (
-                                        <tr key={key}>
-                                            <td>{key + 1}.</td>
-                                            <td>{loanDetail.provider}</td>
-                                            <td>{loanDetail.amount}</td>
-                                            <td>{loanDetail.processing_fee}</td>
-                                            <td>
-                                                {loanDetail.amount -
-                                                    loanDetail.processing_fee}
-                                            </td>
-                                            <td>{loanDetail.interest_rate}</td>
-                                            <td>{loanDetail.emi_count}</td>
-                                            <td>
-                                                {
-                                                    loanDetail.emi_details.filter(
-                                                        (emi) =>
-                                                            emi.status ===
-                                                            "paid"
-                                                    ).length
-                                                }
-                                            </td>
-                                            <td className="p-2 flex">
-                                                <Link
-                                                    href={route(
-                                                        "loan-detail.edit",
-                                                        loanDetail.id
-                                                    )}
-                                                    className="bg-green-500 uppercase hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-                                                >
-                                                    Edit
-                                                </Link>
-                                                <Link
-                                                    href={route(
-                                                        "loan-detail.show",
-                                                        loanDetail.id
-                                                    )}
-                                                    className="bg-blue-500 mx-2 uppercase hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                                                >
-                                                    Show
-                                                </Link>
+                                    {loanDetails.data.map((loanDetail, key) => {
+                                        const paidEmi =
+                                            loanDetail.emi_details.filter(
+                                                (emi) => emi.status === "paid"
+                                            ).length;
 
-                                                <form
-                                                    method="POST"
-                                                    action={route(
-                                                        "loan-detail.destroy",
-                                                        loanDetail.id
-                                                    )}
-                                                    onSubmit={(e) => {
-                                                        if (
-                                                            !confirm(
-                                                                "Are you sure you want to delete this loan?"
-                                                            )
-                                                        ) {
-                                                            e.preventDefault();
-                                                        }
-                                                    }}
-                                                >
-                                                    <input
-                                                        type="hidden"
-                                                        name="_token"
-                                                        value={document
-                                                            .querySelector(
-                                                                'meta[name="csrf-token"]'
-                                                            )
-                                                            .getAttribute(
-                                                                "content"
-                                                            )}
-                                                    />
-
-                                                    <input
-                                                        type="hidden"
-                                                        name="_method"
-                                                        value="DELETE"
-                                                    />
-                                                    <button
-                                                        type="submit"
-                                                        className="bg-red-500 mx-2 uppercase hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                                        return (
+                                            <tr key={key}>
+                                                <td>{key + 1}.</td>
+                                                <td>{loanDetail.provider}</td>
+                                                <td>{loanDetail.amount}</td>
+                                                <td>
+                                                    {loanDetail.processing_fee}
+                                                </td>
+                                                <td>
+                                                    {loanDetail.amount -
+                                                        loanDetail.processing_fee}
+                                                </td>
+                                                <td>
+                                                    {loanDetail.interest_rate}
+                                                </td>
+                                                <td>{loanDetail.emi_count}</td>
+                                                <td>{paidEmi}</td>
+                                                <td>
+                                                    {loanDetail.status.toUpperCase()}
+                                                </td>
+                                                <td className="p-2 flex">
+                                                    <Link
+                                                        href={route(
+                                                            "loan-detail.edit",
+                                                            loanDetail.id
+                                                        )}
+                                                        className="bg-green-500 uppercase hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
                                                     >
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                        Edit
+                                                    </Link>
+                                                    <Link
+                                                        href={route(
+                                                            "loan-detail.show",
+                                                            loanDetail.id
+                                                        )}
+                                                        className="bg-blue-500 mx-2 uppercase hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                                                    >
+                                                        Show
+                                                    </Link>
+                                                    <form
+                                                        method="POST"
+                                                        action={route(
+                                                            "loan-detail.destroy",
+                                                            loanDetail.id
+                                                        )}
+                                                        onSubmit={(e) => {
+                                                            if (
+                                                                !confirm(
+                                                                    "Are you sure you want to delete this loan?"
+                                                                )
+                                                            ) {
+                                                                e.preventDefault();
+                                                            }
+                                                        }}
+                                                    >
+                                                        <input
+                                                            type="hidden"
+                                                            name="_token"
+                                                            value={document
+                                                                .querySelector(
+                                                                    'meta[name="csrf-token"]'
+                                                                )
+                                                                .getAttribute(
+                                                                    "content"
+                                                                )}
+                                                        />
+                                                        <input
+                                                            type="hidden"
+                                                            name="_method"
+                                                            value="DELETE"
+                                                        />
+                                                        <button
+                                                            type="submit"
+                                                            className="bg-red-500 mx-2 uppercase hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
