@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\EmiDetail;
+use App\Models\LoanDetail;
 use Illuminate\Http\Request;
 
 class EmiDetailController extends Controller
@@ -57,6 +58,20 @@ class EmiDetailController extends Controller
         if($emiDetail){
             $emiDetail->status = $request->status;
             $emiDetail->save();
+
+            // Check if all EMIs for this loan are completed
+            $pendingEmis = EmiDetail::where('loan_detail_id', $emiDetail->loan_detail_id)
+                ->where('status', '!=', 'paid')
+                ->count();
+
+            if ($pendingEmis === 0) {
+                // All EMIs are completed, close the loan
+                $loan = LoanDetail::find($emiDetail->loan_detail_id);
+                if ($loan) {
+                    $loan->status = 'closed';
+                    $loan->save();
+                }
+            }
         }
 
         return;
