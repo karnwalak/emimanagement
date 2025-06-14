@@ -154,7 +154,7 @@ class LoanDetailController extends Controller
      */
     public function edit(LoanDetail $loanDetail)
     {
-        $emiDetail = $loanDetail->emiDetail->select('id','loan_detail_id', 'amount', 'due_date');
+        $emiDetail = $loanDetail->emiDetail->select('id','loan_detail_id', 'amount', 'due_date','status');
         return inertia('Edit', compact('loanDetail', 'emiDetail'));
     }
 

@@ -46,7 +46,8 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Get the span element
-        const loanUpdateSuccessMessage = document.getElementById("loanUpdateSuccess");
+        const loanUpdateSuccessMessage =
+            document.getElementById("loanUpdateSuccess");
         post(route("loan-detail.update", loanDetail.id), {
             onSuccess: () => {
                 // Update the span with success message and classes
@@ -62,7 +63,6 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
                 }, 5000);
             },
             onError: (errors) => {
-               
                 loanUpdateSuccessMessage.innerHTML =
                     "An error occurred while updating EMI details.";
                 loanUpdateSuccessMessage.className =
@@ -119,7 +119,7 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
                     successMessageSpan.innerHTML = "";
                     successMessageSpan.className = "";
                 }, 5000);
-            }else{
+            } else {
                 throw new Error(
                     result.message || "Failed to update EMI details."
                 );
@@ -139,7 +139,7 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
     };
 
     // Handle foreclose loan
-    const foreCloseLoan = async (loanId,event) => {
+    const foreCloseLoan = async (loanId, event) => {
         event.preventDefault(); // Prevent default form submission
         const csrfToken = document
             .querySelector('meta[name="csrf-token"]')
@@ -155,11 +155,10 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
         const result = await response.json();
         if (result.status === true) {
             // Update the span with success message and classes
-            const successMessageSpan = document.getElementById("successMessage");
-            successMessageSpan.innerHTML =
-                "Loan foreclosed successfully!";
-            successMessageSpan.className =
-                "text-green-600 font-semibold mt-2";
+            const successMessageSpan =
+                document.getElementById("successMessage");
+            successMessageSpan.innerHTML = "Loan foreclosed successfully!";
+            successMessageSpan.className = "text-green-600 font-semibold mt-2";
 
             // Remove the message after 5 seconds
             setTimeout(() => {
@@ -172,14 +171,14 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
     };
 
     // Handle Emi skip
-    const handleEmiSkip = async (loanId,emiId, event) => {
+    const handleEmiSkip = async (loanId, emiId, event) => {
         event.preventDefault();
         const csrfToken = document
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute("content");
         const response = await fetch(`/emi-skipped`, {
             method: "POST",
-            body: JSON.stringify({ emi_id: emiId,loan_id: loanId }),
+            body: JSON.stringify({ emi_id: emiId, loan_id: loanId }),
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": csrfToken,
@@ -202,8 +201,7 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
         } else {
             console.error("Error:", result.message);
         }
-        
-    }
+    };
     return (
         <AuthenticatedLayout
             header={
@@ -515,19 +513,26 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
                                                                 )
                                                             }
                                                         />
-                                                        <button
-                                                            onClick={() =>
-                                                                handleEmiSkip(
-                                                                    loanDetail.id,
-                                                                    emi.id,
-                                                                    event
-                                                                )
-                                                            }
-                                                            type="button"
-                                                            className="bg-red-500 mx-2 uppercase hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-                                                        >
-                                                            Skipped
-                                                        </button>
+                                                        {emi.status ==
+                                                        "paid" ? (
+                                                            <span className="bg-green-500 mx-2 uppercase hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                                                                Paid
+                                                            </span>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleEmiSkip(
+                                                                        loanDetail.id,
+                                                                        emi.id,
+                                                                        event
+                                                                    )
+                                                                }
+                                                                type="button"
+                                                                className="bg-red-500 mx-2 uppercase hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                                                            >
+                                                                Skipped
+                                                            </button>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}
