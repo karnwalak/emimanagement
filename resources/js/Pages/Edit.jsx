@@ -6,7 +6,7 @@ import SelectInput from "@/Components/SelectInput";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 import PrimaryButton from "@/Components/PrimaryButton";
-import { Transition } from "@headlessui/react";
+import { Button, Transition } from "@headlessui/react";
 import { useState } from "react";
 
 export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
@@ -170,6 +170,40 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
             console.error("Error:", result.message);
         }
     };
+
+    // Handle Emi skip
+    const handleEmiSkip = async (loanId,emiId, event) => {
+        event.preventDefault();
+        const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
+        const response = await fetch(`/emi-skipped`, {
+            method: "POST",
+            body: JSON.stringify({ emi_id: emiId,loan_id: loanId }),
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+        });
+        const result = await response.json();
+        if (result.status === true) {
+            // Update the span with success message and classes
+            const successMessageSpan =
+                document.getElementById("successMessage");
+            successMessageSpan.innerHTML = "Emi details updated successfully!";
+            successMessageSpan.className = "text-green-600 font-semibold mt-2";
+
+            // Remove the message after 5 seconds
+            setTimeout(() => {
+                successMessageSpan.innerHTML = "";
+                successMessageSpan.className = "";
+                location.reload();
+            }, 5000);
+        } else {
+            console.error("Error:", result.message);
+        }
+        
+    }
     return (
         <AuthenticatedLayout
             header={
@@ -184,7 +218,7 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
                         <button
                             type="button"
-                            onClick={() => foreCloseLoan(loanDetail.id,event)}
+                            onClick={() => foreCloseLoan(loanDetail.id, event)}
                             className="bg-green-500 my-2 uppercase hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
                         >
                             Foreclose Loan
@@ -481,6 +515,19 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
                                                                 )
                                                             }
                                                         />
+                                                        <button
+                                                            onClick={() =>
+                                                                handleEmiSkip(
+                                                                    loanDetail.id,
+                                                                    emi.id,
+                                                                    event
+                                                                )
+                                                            }
+                                                            type="button"
+                                                            className="bg-red-500 mx-2 uppercase hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                                                        >
+                                                            Skipped
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))}

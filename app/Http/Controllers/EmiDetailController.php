@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\EmiDetail;
 use Illuminate\Http\Request;
 
@@ -73,8 +74,17 @@ class EmiDetailController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(EmiDetail $emiDetail)
+    public function emiSkipped(Request $request)
     {
-        //
+        $emiId = $request->emi_id;
+        $loanId = $request->loan_id;
+        $restEmis = EmiDetail::where('id','>=',$emiId)->where('loan_detail_id',$loanId)->get();
+        foreach($restEmis as $emi){
+            $newDate = Carbon::parse($emi->due_date);
+            $emi->due_date = $newDate->addMonth(); 
+            $emi->save();
+        }
+
+        return response()->json(['status' => true, 'message' => 'Emi details are updated!']);
     }
 }

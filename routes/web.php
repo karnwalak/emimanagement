@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/foreclose-loan', [LoanDetailController::class, 'forecloseLoan']);
     Route::resource('/emi-detail', EmiDetailController::class);
     Route::post('/update-emi', [EmiDetailController::class,'updateEmi']);
+    Route::post('/emi-skipped', [EmiDetailController::class, 'emiSkipped']);
 });
 
 require __DIR__.'/auth.php';
