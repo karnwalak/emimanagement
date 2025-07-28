@@ -19,5 +19,9 @@
         "react-dom": "^18.3.1",
         "tailwindcss": "^3.2.1",
         "vite": "^5.0"
+    },
+    "dependencies": {
+        "datatables.net-dt": "^2.3.2",
+        "datatables.net-react": "^1.0.1"
     }
 }

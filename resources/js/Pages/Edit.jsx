@@ -137,13 +137,13 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
             }, 5000);
         }
     };
-
+    
     // Handle foreclose loan
     const foreCloseLoan = async (loanId, event) => {
         event.preventDefault(); // Prevent default form submission
         const csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content");
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content");
         const response = await fetch(`/foreclose-loan`, {
             method: "POST",
             body: JSON.stringify({ loan_id: loanId }),
@@ -156,26 +156,27 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
         if (result.status === true) {
             // Update the span with success message and classes
             const successMessageSpan =
-                document.getElementById("successMessage");
+            document.getElementById("successMessage");
             successMessageSpan.innerHTML = "Loan foreclosed successfully!";
             successMessageSpan.className = "text-green-600 font-semibold mt-2";
-
+            
             // Remove the message after 5 seconds
             setTimeout(() => {
                 successMessageSpan.innerHTML = "";
                 successMessageSpan.className = "";
+                window.location = "/loan-detail";
             }, 5000);
         } else {
             console.error("Error:", result.message);
         }
     };
-
+    
     // Handle Emi skip
     const handleEmiSkip = async (loanId, emiId, event) => {
         event.preventDefault();
         const csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content");
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content");
         const response = await fetch(`/emi-skipped`, {
             method: "POST",
             body: JSON.stringify({ emi_id: emiId, loan_id: loanId }),
@@ -188,7 +189,7 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
         if (result.status === true) {
             // Update the span with success message and classes
             const successMessageSpan =
-                document.getElementById("successMessage");
+            document.getElementById("successMessage");
             successMessageSpan.innerHTML = "Emi details updated successfully!";
             successMessageSpan.className = "text-green-600 font-semibold mt-2";
 
@@ -221,6 +222,9 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
                         >
                             Foreclose Loan
                         </button>
+                        <div>
+                            <span id="successMessage" className=""></span>
+                        </div>
                         <form onSubmit={handleSubmit} method="post">
                             <div>
                                 <InputLabel
@@ -546,7 +550,6 @@ export default function Edit({ mustVerifyEmail, loanDetail, emiDetail }) {
                                         Update
                                     </button>
                                 </div>
-                                <span id="successMessage" className=""></span>
                             </div>
                         </form>
                     </div>

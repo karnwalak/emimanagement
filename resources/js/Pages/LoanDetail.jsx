@@ -2,7 +2,59 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Button } from "@headlessui/react";
 import { Head, Link } from "@inertiajs/react";
 
+import React from "react";
+import axios from "axios";
+
 export default function Dashboard({ loanDetails }) {
+    const handlePayment = async () => {
+        const amount = 5000; // replace with dynamic amount
+
+        // 1. Create order on backend
+        const res = await axios.post("/create-order", { amount });
+
+        const { order_id, razorpay_key, currency } = res.data;
+
+        // 2. Open Razorpay Checkout
+        const options = {
+            key: "rzp_test_2FVsQnHLJifMbi",
+            amount: amount * 100,
+            currency: currency,
+            name: "Akk Technology",
+            description: "Subscription charge for EMI Management!",
+            order_id: order_id,
+            handler: function (response) {
+                console.log(response); // Send this to backend for verification if needed
+                // payment verification in Laravel Controller
+                axios.post("/verify-payment", {
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature
+                });
+            },
+            prefill: {
+                name: "Akshay Kumar Karnwal",
+                email: "karnwalakshay7@gmail.com",
+                contact: "9568936879",
+            },
+            notes: {
+                loan_id: "123456", // Optional
+            },
+            theme: {
+                color: "#3399cc",
+            },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+    };
+
+    React.useEffect(() => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        document.body.appendChild(script);
+    }, []);
+
     return (
         <AuthenticatedLayout
             header={
@@ -10,6 +62,13 @@ export default function Dashboard({ loanDetails }) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                         Loan Detail
                     </h2>
+
+                    <Link
+                        onClick={handlePayment}
+                        className="inline-flex items-center rounded-md border border-transparent bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white transition duration-150 ease-in-out hover:bg-gray-700 focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:bg-gray-900 dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-white dark:focus:bg-white dark:focus:ring-offset-gray-800 dark:active:bg-gray-300 false"
+                    >
+                        Pay Now!
+                    </Link>
 
                     <Link
                         href={route("loan-detail.create")}

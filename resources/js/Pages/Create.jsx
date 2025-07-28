@@ -11,7 +11,6 @@ import { useState } from "react";
 
 export default function Create({ mustVerifyEmail,users }) {
     const { data, setData, post, errors, reset } = useForm({
-        user: "",
         provider: "",
         amount: "",
         processing_fee: "",
@@ -55,27 +54,6 @@ export default function Create({ mustVerifyEmail,users }) {
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
                     <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
                         <form onSubmit={handleSubmit} method="post">
-                            <div>
-                                <InputLabel htmlFor="user" value="User" />
-                                <SelectInput
-                                    className="mt-1 block w-full"
-                                    value={data.user}
-                                    onChange={(e) =>
-                                        setData("user", e.target.value)
-                                    }
-                                >
-                                    <option value="">Select User</option>
-                                    {users.map((user) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
-                                        </option>
-                                    ))}
-                                </SelectInput>
-                                <InputError
-                                    message={errors.user}
-                                    className="mt-2"
-                                />
-                            </div>
                             <div>
                                 <InputLabel
                                     htmlFor="provider"

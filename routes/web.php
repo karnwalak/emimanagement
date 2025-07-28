@@ -1,11 +1,12 @@
 <?php
 
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EmiDetailController;
 use App\Http\Controllers\LoanDetailController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -29,6 +30,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('/emi-detail', EmiDetailController::class);
     Route::post('/update-emi', [EmiDetailController::class,'updateEmi']);
     Route::post('/emi-skipped', [EmiDetailController::class, 'emiSkipped']);
+    Route::get('/pay', [PaymentController::class, 'payAmount'])->name('pay');
+    Route::post('/create-order', [PaymentController::class, 'createRazorpayOrder']);
+    Route::post('/verify-payment', [PaymentController::class, 'verifyPayment']);
 });
 
 require __DIR__.'/auth.php';
