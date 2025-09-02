@@ -17,6 +17,15 @@
     @viteReactRefresh
     @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
     @inertiaHead
+    <style>
+        .form-control-sm {
+            color: black;
+        }
+
+        .form-select-sm {
+            color: black;
+        }
+    </style>
 </head>
 
 <body class="font-sans antialiased">
