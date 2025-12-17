@@ -65,79 +65,79 @@ export default function Dashboard({ loanDetails }) {
         ajax: {
             url: "/api/loan-detail", // Your AJAX endpoint
             type: "GET",
-            data: function(d) {
+            data: function (d) {
                 // You can add custom parameters here
                 // d.custom_param = "value";
                 return d;
             },
-            error: function(xhr, error, code) {
+            error: function (xhr, error, code) {
                 console.error('DataTable AJAX error:', error, code);
             }
         },
         columns: [
-            { 
+            {
                 data: null,
                 name: 'serial',
                 orderable: false,
                 searchable: false,
-                render: function(data, type, row, meta) {
+                render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1 + '.';
                 }
             },
             { data: 'provider', name: 'provider' },
-            { 
-                data: 'amount', 
+            {
+                data: 'amount',
                 name: 'amount',
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     console.log(row);
                     return '₹' + parseFloat(data).toLocaleString();
                 }
             },
-            { 
-                data: 'processing_fee', 
+            {
+                data: 'processing_fee',
                 name: 'processing_fee',
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     return '₹' + parseFloat(data).toLocaleString();
                 }
             },
-            { 
+            {
                 data: null,
                 name: 'amount_you_get',
                 orderable: false,
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     const amountYouGet = parseFloat(row.amount) - parseFloat(row.processing_fee);
                     return '₹' + amountYouGet.toLocaleString();
                 }
             },
-            { 
-                data: 'interest_rate', 
+            {
+                data: 'interest_rate',
                 name: 'interest_rate',
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     return data + '%';
                 }
             },
-            { 
-                data: 'emi_count', 
+            {
+                data: 'emi_count',
                 name: 'emi_count',
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     return row.emi_count;
                 }
             },
-            { 
-                data: 'paid_emi_count', 
+            {
+                data: 'paid_emi_count',
                 name: 'paid_emi_count',
                 orderable: false,
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     const paidEmi = row.emi_detail.filter(
-                            (emi) => emi.status === "paid"
-                        ).length;
+                        (emi) => emi.status === "paid"
+                    ).length;
                     return paidEmi;
                 }
             },
-            { 
-                data: 'status', 
+            {
+                data: 'status',
                 name: 'status',
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     const statusClass = data === 'closed' ? 'text-red-600' : 'text-green-600';
                     return `<span class="${statusClass} font-semibold">${data.toUpperCase()}</span>`;
                 }
@@ -147,7 +147,7 @@ export default function Dashboard({ loanDetails }) {
                 name: 'actions',
                 orderable: false,
                 searchable: false,
-                render: function(data, type, row) {
+                render: function (data, type, row) {
                     return `
                         <div class="flex space-x-2">
                             <a href="/loan-detail/${data}/edit" 
@@ -180,17 +180,17 @@ export default function Dashboard({ loanDetails }) {
             infoFiltered: "(filtered from _MAX_ total entries)",
             lengthMenu: "Show _MENU_ entries",
             loadingRecords: "Loading...",
-            paginate: {
-                first: "First",
-                last: "Last",
-                next: "Next",
-                previous: "Previous"
-            },
+            // paginate: {
+            //     first: "First",
+            //     last: "Last",
+            //     next: "Next",
+            //     previous: "Previous"
+            // },
             search: "Search:",
             zeroRecords: "No matching records found",
             paginate: {
                 first: "«",
-                last: "»", 
+                last: "»",
                 next: "›",
                 previous: "‹"
             }
@@ -199,7 +199,7 @@ export default function Dashboard({ loanDetails }) {
         className: "w-full text-sm text-left text-gray-500 dark:text-gray-400"
     };
 
-    
+
     // Delete function (make it global so it can be called from rendered HTML)
     useEffect(() => {
         // Custom CSS for DataTables pagination styling
@@ -382,12 +382,12 @@ export default function Dashboard({ loanDetails }) {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         }
                     });
-                    
+
                     // Reload the DataTable
                     if (tableRef.current) {
                         tableRef.current.dt().ajax.reload();
                     }
-                    
+
                     // Show success message
                     alert('Loan deleted successfully!');
                 } catch (error) {
