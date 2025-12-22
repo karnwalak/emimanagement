@@ -11,6 +11,7 @@ DataTable.use(DT);
 
 import React, { useRef, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function Dashboard({ loanDetails }) {
     const tableRef = useRef();
@@ -247,43 +248,70 @@ export default function Dashboard({ loanDetails }) {
         const addCustomStyles = () => {
             const style = document.createElement('style');
             style.textContent = `
-                /* DataTables Custom Polish */
+                /* DataTables Search and Length Styling */
                 .dataTables_wrapper .dataTables_length, 
-                .dataTables_wrapper .dataTables_filter {
-                    margin-bottom: 1.5rem;
+                .dataTables_wrapper .dataTables_filter,
+                .dt-length, .dt-search {
+                    margin-bottom: 1.5rem !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 0.5rem !important;
                 }
                 
-                .dataTables_filter input {
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.5rem;
-                    padding: 0.5rem 1rem;
-                    outline: none;
-                    transition: all 0.2s;
-                    background: #f9fafb;
+                .dataTables_filter input, .dt-search input {
+                    border: 1px solid #e5e7eb !important;
+                    border-radius: 0.75rem !important;
+                    padding: 0.5rem 1rem !important;
+                    outline: none !important;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    background: #f9fafb !important;
+                    font-size: 0.875rem !important;
+                    min-width: 250px !important;
                 }
 
-                .dark .dataTables_filter input {
-                    background: #1f2937;
-                    border-color: #374151;
-                    color: #f9fafb;
+                .dark .dataTables_filter input, .dark .dt-search input {
+                    background: #1f2937 !important;
+                    border-color: #374151 !important;
+                    color: #f9fafb !important;
                 }
 
-                .dataTables_filter input:focus {
-                    border-color: #4f46e5;
-                    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+                .dataTables_filter input:focus, .dt-search input:focus {
+                    border-color: #4f46e5 !important;
+                    background: white !important;
+                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
+                    transform: translateY(-1px) !important;
+                }
+
+                .dark .dataTables_filter input:focus, .dark .dt-search input:focus {
+                    background: #111827 !important;
+                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2) !important;
                 }
                 
-                .dataTables_length select {
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.375rem;
-                    padding-right: 2rem;
-                    background-color: #f9fafb;
+                .dataTables_length select, .dt-length select {
+                    border: 1px solid #e5e7eb !important;
+                    border-radius: 0.75rem !important;
+                    padding: 0.5rem 2.5rem 0.5rem 1rem !important;
+                    background-color: #f9fafb !important;
+                    font-size: 0.875rem !important;
+                    cursor: pointer !important;
+                    appearance: none !important;
+                    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='Step Id: 6 10l4 4 4-4'/%3e%3c/svg%3e") !important;
+                    background-position: right 0.5rem center !important;
+                    background-repeat: no-repeat !important;
+                    background-size: 1.5em 1.5em !important;
+                    transition: all 0.2s !important;
                 }
 
-                .dark .dataTables_length select {
-                    background-color: #1f2937;
-                    border-color: #374151;
-                    color: #f9fafb;
+                .dark .dataTables_length select, .dark .dt-length select {
+                    background-color: #1f2937 !important;
+                    border-color: #374151 !important;
+                    color: #f9fafb !important;
+                    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='Step Id: 6 10l4 4 4-4'/%3e%3c/svg%3e") !important;
+                }
+
+                .dataTables_length select:focus, .dt-length select:focus {
+                    border-color: #4f46e5 !important;
+                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
                 }
 
                 /* Table Hover Effects */
@@ -295,54 +323,97 @@ export default function Dashboard({ loanDetails }) {
                     background-color: rgba(255, 255, 255, 0.02) !important;
                 }
 
-                /* Pagination */
-                .dataTables_paginate {
-                    padding-top: 1.5rem;
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 0.25rem;
+                /* Pagination Styling - Supporting both DataTables 1.x and 2.x */
+                .dataTables_paginate, .dt-paging {
+                    padding-top: 1.5rem !important;
+                    display: flex !important;
+                    justify-content: flex-end !important;
+                    flex-wrap: wrap !important;
+                    gap: 0.5rem !important;
                 }
 
-                .dataTables_paginate .paginate_button {
-                    padding: 0.5rem 1rem;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.5rem;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    background: white;
-                    color: #374151 !important;
+                .dataTables_paginate .paginate_button, .dt-paging .dt-paging-button {
+                    padding: 0.5rem 1rem !important;
+                    border: 1px solid #4f46e5 !important;
+                    border-radius: 0.75rem !important;
+                    cursor: pointer !important;
+                    transition: all 0.2s ease-in-out !important;
+                    background: white !important;
+                    color: #4f46e5 !important;
+                    font-weight: 600 !important;
+                    font-size: 0.875rem !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    min-width: 40px !important;
+                    text-decoration: none !important;
+                    margin: 0 !important; /* Reset default margins */
+                    box-sizing: border-box !important;
                 }
 
-                .dark .dataTables_paginate .paginate_button {
-                    background: #1f2937;
-                    border-color: #374151;
-                    color: #9ca3af !important;
+                /* Ensure specific gap and margin for stability */
+                .dataTables_paginate .paginate_button:not(:last-child), 
+                .dt-paging .dt-paging-button:not(:last-child) {
+                    margin-right: 2px !important;
                 }
 
-                .dataTables_paginate .paginate_button:hover:not(.current) {
-                    background: #f3f4f6 !important;
-                    border-color: #d1d5db !important;
+                .dark .dataTables_paginate .paginate_button, .dark .dt-paging .dt-paging-button {
+                    background: #1f2937 !important;
+                    border-color: #6366f1 !important;
+                    color: #a5b4fc !important;
                 }
 
-                .dark .dataTables_paginate .paginate_button:hover:not(.current) {
-                    background: #374151 !important;
+                .dataTables_paginate .paginate_button:hover:not(.current):not(.disabled), 
+                .dt-paging .dt-paging-button:hover:not(.current):not(.disabled) {
+                    background: #eef2ff !important;
+                    border-color: #4338ca !important;
+                    color: #4338ca !important;
+                    transform: translateY(-1px) !important;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
                 }
 
-                .dataTables_paginate .paginate_button.current {
+                .dark .dataTables_paginate .paginate_button:hover:not(.current):not(.disabled),
+                .dark .dt-paging .dt-paging-button:hover:not(.current):not(.disabled) {
+                    background: #312e81 !important;
+                    border-color: #818cf8 !important;
+                    color: white !important;
+                }
+
+                .dataTables_paginate .paginate_button.current, 
+                .dt-paging .dt-paging-button.current {
                     background: #4f46e5 !important;
                     border-color: #4f46e5 !important;
                     color: white !important;
-                    font-weight: 600;
+                    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4) !important;
                 }
 
-                .dataTables_info {
-                    padding-top: 1.5rem;
-                    color: #6b7280;
-                    font-size: 0.875rem;
+                .dataTables_paginate .paginate_button.disabled, 
+                .dt-paging .dt-paging-button.disabled {
+                    cursor: not-allowed !important;
+                    opacity: 0.4 !important;
+                    background: #f3f4f6 !important;
+                    color: #9ca3af !important;
+                    border-color: #e5e7eb !important;
+                    transform: none !important;
+                    box-shadow: none !important;
                 }
 
-                .dark .dataTables_info {
-                    color: #9ca3af;
+                .dark .dataTables_paginate .paginate_button.disabled,
+                .dark .dt-paging .dt-paging-button.disabled {
+                    background: #374151 !important;
+                    border-color: #4b5563 !important;
+                    color: #6b7280 !important;
+                }
+
+                .dataTables_info, .dt-info {
+                    padding-top: 1.5rem !important;
+                    color: #6b7280 !important;
+                    font-size: 0.875rem !important;
+                    font-weight: 500 !important;
+                }
+
+                .dark .dataTables_info, .dark .dt-info {
+                    color: #9ca3af !important;
                 }
             `;
             document.head.appendChild(style);
@@ -351,7 +422,26 @@ export default function Dashboard({ loanDetails }) {
         addCustomStyles();
 
         window.deleteLoan = async (loanId) => {
-            if (confirm('Are you sure you want to delete this loan?')) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+                background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937',
+                borderRadius: '1rem',
+                customClass: {
+                    popup: 'rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700',
+                    confirmButton: 'rounded-xl px-6 py-2.5 font-bold uppercase tracking-widest text-sm transition-all duration-200 hover:scale-105 active:scale-95',
+                    cancelButton: 'rounded-xl px-6 py-2.5 font-bold uppercase tracking-widest text-sm transition-all duration-200 hover:scale-105 active:scale-95'
+                }
+            });
+
+            if (result.isConfirmed) {
                 try {
                     await axios.delete(`/loan-detail/${loanId}`, {
                         headers: {
@@ -365,10 +455,34 @@ export default function Dashboard({ loanDetails }) {
                     }
 
                     // Show success message
-                    alert('Loan deleted successfully!');
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Loan has been deleted successfully.',
+                        icon: 'success',
+                        confirmButtonColor: '#4f46e5',
+                        background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                        color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937',
+                        borderRadius: '1rem',
+                        customClass: {
+                            popup: 'rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700',
+                            confirmButton: 'rounded-xl px-6 py-2.5 font-bold uppercase tracking-widest text-sm transition-all duration-200 hover:scale-105 active:scale-95'
+                        }
+                    });
                 } catch (error) {
                     console.error('Error deleting loan:', error);
-                    alert('Error deleting loan. Please try again.');
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Error deleting loan. Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#4f46e5',
+                        background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                        color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#1f2937',
+                        borderRadius: '1rem',
+                        customClass: {
+                            popup: 'rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700',
+                            confirmButton: 'rounded-xl px-6 py-2.5 font-bold uppercase tracking-widest text-sm transition-all duration-200 hover:scale-105 active:scale-95'
+                        }
+                    });
                 }
             }
         };
