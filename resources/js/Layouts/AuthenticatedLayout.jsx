@@ -4,6 +4,13 @@ import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faTachometerAlt,
+    faHandHoldingUsd,
+    faUserCircle,
+    faSignOutAlt
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -12,8 +19,8 @@ export default function AuthenticatedLayout({ header, children }) {
         useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-            <nav className="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] selection:bg-indigo-500 selection:text-white">
+            <nav className="sticky top-0 z-50 border-b border-gray-200/50 bg-white/80 backdrop-blur-md dark:border-gray-700/50 dark:bg-gray-800/80">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
@@ -23,18 +30,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </Link>
                             </div>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <div className="hidden space-x-1 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
                                     href={route("dashboard")}
                                     active={route().current("dashboard")}
+                                    className="px-4 transition-all duration-200"
                                 >
+                                    <FontAwesomeIcon icon={faTachometerAlt} className="mr-2 opacity-70" />
                                     Dashboard
                                 </NavLink>
                                 <NavLink
                                     href={route("loan-detail.index")}
                                     active={route().current("loan-detail.index")}
+                                    className="px-4 transition-all duration-200"
                                 >
-                                    Loan Detail
+                                    <FontAwesomeIcon icon={faHandHoldingUsd} className="mr-2 opacity-70" />
+                                    Loans
                                 </NavLink>
                             </div>
                         </div>
@@ -46,12 +57,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <span className="inline-flex rounded-md">
                                             <button
                                                 type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
+                                                className="inline-flex items-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 px-4 py-2 text-sm font-bold leading-4 text-gray-700 transition duration-200 hover:bg-white dark:hover:bg-gray-800 focus:outline-none dark:text-gray-300"
                                             >
+                                                <div className="w-6 h-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-[10px] text-white mr-2 shadow-sm font-black">
+                                                    {user.name.charAt(0)}
+                                                </div>
                                                 {user.name}
 
                                                 <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
+                                                    className="-me-0.5 ms-2 h-4 w-4 opacity-50 transition-transform group-hover:rotate-180"
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     viewBox="0 0 20 20"
                                                     fill="currentColor"
@@ -69,15 +83,19 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Dropdown.Content>
                                         <Dropdown.Link
                                             href={route("profile.edit")}
+                                            className="flex items-center"
                                         >
-                                            Profile
+                                            <FontAwesomeIcon icon={faUserCircle} className="mr-2 opacity-70" />
+                                            My Profile
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route("logout")}
                                             method="post"
                                             as="button"
+                                            className="flex items-center text-red-600 dark:text-red-400"
                                         >
-                                            Log Out
+                                            <FontAwesomeIcon icon={faSignOutAlt} className="mr-2 opacity-70" />
+                                            Sign Out
                                         </Dropdown.Link>
                                     </Dropdown.Content>
                                 </Dropdown>
@@ -169,8 +187,8 @@ export default function AuthenticatedLayout({ header, children }) {
             </nav>
 
             {header && (
-                <header className="bg-white shadow dark:bg-gray-800">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <header className="bg-white/40 dark:bg-gray-800/40 border-b border-gray-200 dark:border-gray-700">
+                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                         {header}
                     </div>
                 </header>

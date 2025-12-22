@@ -4,6 +4,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faKey } from "@fortawesome/free-solid-svg-icons";
 
 export default function ResetPassword({ token, email }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -25,9 +27,18 @@ export default function ResetPassword({ token, email }) {
         <GuestLayout>
             <Head title="Reset Password" />
 
-            <form onSubmit={submit}>
+            <div className="mb-8 text-center">
+                <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                    New Password
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    Create a strong password for your account
+                </p>
+            </div>
+
+            <form onSubmit={submit} className="space-y-6">
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="Email" className="font-bold text-gray-700 dark:text-gray-300" />
 
                     <TextInput
                         id="email"
@@ -42,8 +53,8 @@ export default function ResetPassword({ token, email }) {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                <div>
+                    <InputLabel htmlFor="password" value="New Password" className="font-bold text-gray-700 dark:text-gray-300" />
 
                     <TextInput
                         id="password"
@@ -51,6 +62,7 @@ export default function ResetPassword({ token, email }) {
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"
+                        placeholder="••••••••"
                         autoComplete="new-password"
                         isFocused={true}
                         onChange={(e) => setData('password', e.target.value)}
@@ -59,10 +71,11 @@ export default function ResetPassword({ token, email }) {
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
+                <div>
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="Confirm New Password"
+                        className="font-bold text-gray-700 dark:text-gray-300"
                     />
 
                     <TextInput
@@ -71,6 +84,7 @@ export default function ResetPassword({ token, email }) {
                         name="password_confirmation"
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
+                        placeholder="••••••••"
                         autoComplete="new-password"
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
@@ -83,9 +97,13 @@ export default function ResetPassword({ token, email }) {
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
+                <div className="pt-2">
+                    <PrimaryButton
+                        className="w-full justify-center py-4 rounded-2xl text-md font-black shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-[0.98] transition-all"
+                        disabled={processing}
+                    >
+                        <FontAwesomeIcon icon={faKey} className="mr-2" />
+                        Update Password
                     </PrimaryButton>
                 </div>
             </form>

@@ -1,15 +1,13 @@
-import Dropdown from "@/Components/Dropdown";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head, useForm, Link } from "@inertiajs/react";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
-import SelectInput from "@/Components/SelectInput";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
-import PrimaryButton from "@/Components/PrimaryButton";
-import { Transition } from "@headlessui/react";
-import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faSave, faCalendarAlt, faPercentage, faMoneyBillWave, faUniversity } from "@fortawesome/free-solid-svg-icons";
+import { useState, useEffect } from "react";
 
-export default function Create({ mustVerifyEmail,users }) {
+export default function Create({ mustVerifyEmail, users }) {
     const { data, setData, post, errors, reset } = useForm({
         provider: "",
         amount: "",
@@ -38,235 +36,214 @@ export default function Create({ mustVerifyEmail,users }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(data);
-      post(route("loan-detail.store"));
-    } 
+        post(route("loan-detail.store"));
+    }
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Create
-                </h2>
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+                    <div>
+                        <h2 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 leading-tight">
+                            Add New Loan
+                        </h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Register a new loan entry to start tracking EMIs</p>
+                    </div>
+
+                    <Link
+                        href={route("loan-detail.index")}
+                        className="inline-flex items-center px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-bold text-gray-700 dark:text-gray-200 shadow-sm transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:-translate-y-0.5"
+                    >
+                        <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+                        Back to List
+                    </Link>
+                </div>
             }
         >
             <Head title="Loan Detail" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8 dark:bg-gray-800">
-                        <form onSubmit={handleSubmit} method="post">
-                            <div>
-                                <InputLabel
-                                    htmlFor="provider"
-                                    value="Provider"
-                                />
+            <div className="py-8">
+                <div className="mx-auto max-w-4xl sm:px-6 lg:px-8">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700">
+                        <div className="p-8">
+                            <form onSubmit={handleSubmit} className="space-y-8">
+                                {/* Basic Info Section */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="md:col-span-2 border-b border-gray-100 dark:border-gray-700 pb-2">
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center">
+                                            <FontAwesomeIcon icon={faUniversity} className="mr-2 text-indigo-500" />
+                                            Loan Information
+                                        </h3>
+                                    </div>
 
-                                <TextInput
-                                    id="provider"
-                                    onChange={(e) =>
-                                        setData("provider", e.target.value)
-                                    }
-                                    type="text"
-                                    className="mt-1 block w-full"
-                                    autoComplete="provider"
-                                />
+                                    <div className="space-y-1.5">
+                                        <InputLabel htmlFor="provider" value="Bank / Provider Name" className="text-xs font-bold uppercase tracking-wider text-gray-500" />
+                                        <div className="relative">
+                                            <TextInput
+                                                id="provider"
+                                                value={data.provider}
+                                                onChange={(e) => setData("provider", e.target.value)}
+                                                type="text"
+                                                className="block w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-900 focus:ring-indigo-500"
+                                                placeholder="e.g. HDFC Bank, KreditBee"
+                                                required
+                                            />
+                                        </div>
+                                        <InputError message={errors.provider} className="mt-1" />
+                                    </div>
 
-                                <InputError
-                                    message={errors.provider}
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div>
-                                <InputLabel htmlFor="amount" value="Amount" />
+                                    <div className="space-y-1.5">
+                                        <InputLabel htmlFor="date" value="Disbursed Date" className="text-xs font-bold uppercase tracking-wider text-gray-500" />
+                                        <div className="relative">
+                                            <TextInput
+                                                id="date"
+                                                value={data.date}
+                                                onChange={(e) => setData("date", e.target.value)}
+                                                type="date"
+                                                className="block w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-900"
+                                                required
+                                            />
+                                        </div>
+                                        <InputError message={errors.date} className="mt-1" />
+                                    </div>
 
-                                <TextInput
-                                    id="amount"
-                                    onChange={(e) =>
-                                        setData("amount", e.target.value)
-                                    }
-                                    type="text"
-                                    className="mt-1 block w-full"
-                                    autoComplete="amount"
-                                />
+                                    <div className="space-y-1.5">
+                                        <InputLabel htmlFor="amount" value="Loan Amount (₹)" className="text-xs font-bold uppercase tracking-wider text-gray-500" />
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span className="text-gray-500 sm:text-sm">₹</span>
+                                            </div>
+                                            <TextInput
+                                                id="amount"
+                                                value={data.amount}
+                                                onChange={(e) => setData("amount", e.target.value)}
+                                                type="number"
+                                                className="block w-full pl-7 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-900"
+                                                placeholder="0.00"
+                                                required
+                                            />
+                                        </div>
+                                        <InputError message={errors.amount} className="mt-1" />
+                                    </div>
 
-                                <InputError
-                                    message={errors.amount}
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div>
-                                <InputLabel
-                                    htmlFor="processing_fee"
-                                    value="Processing Fee"
-                                />
+                                    <div className="space-y-1.5">
+                                        <InputLabel htmlFor="processing_fee" value="Processing Fee (₹)" className="text-xs font-bold uppercase tracking-wider text-gray-500" />
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span className="text-gray-500 sm:text-sm">₹</span>
+                                            </div>
+                                            <TextInput
+                                                id="processing_fee"
+                                                value={data.processing_fee}
+                                                onChange={(e) => setData("processing_fee", e.target.value)}
+                                                type="number"
+                                                className="block w-full pl-7 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-900"
+                                                placeholder="0.00"
+                                            />
+                                        </div>
+                                        <InputError message={errors.processing_fee} className="mt-1" />
+                                    </div>
 
-                                <TextInput
-                                    id="processing_fee"
-                                    onChange={(e) =>
-                                        setData(
-                                            "processing_fee",
-                                            e.target.value
-                                        )
-                                    }
-                                    type="text"
-                                    className="mt-1 block w-full"
-                                    autoComplete="processing_fee"
-                                />
+                                    <div className="space-y-1.5">
+                                        <InputLabel htmlFor="interest_rate" value="Interest Rate (%)" className="text-xs font-bold uppercase tracking-wider text-gray-500" />
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <FontAwesomeIcon icon={faPercentage} className="text-gray-400 text-xs" />
+                                            </div>
+                                            <TextInput
+                                                id="interest_rate"
+                                                value={data.interest_rate}
+                                                onChange={(e) => setData("interest_rate", e.target.value)}
+                                                type="number"
+                                                step="0.01"
+                                                className="block w-full pl-8 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-900"
+                                                placeholder="0.00"
+                                                required
+                                            />
+                                        </div>
+                                        <InputError message={errors.interest_rate} className="mt-1" />
+                                    </div>
 
-                                <InputError
-                                    message={errors.processing_fee}
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div>
-                                <InputLabel
-                                    htmlFor="interest_rate"
-                                    value="Interest Rate"
-                                />
+                                    <div className="md:col-span-2 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-2xl">
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 dark:text-white">Repayment Type</h4>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400 text-xs">How do you want to calculate the EMIs?</p>
+                                            </div>
+                                            <div className="flex p-1 bg-gray-200 dark:bg-gray-700 rounded-xl w-fit">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleLoanTypeChange({ target: { value: 'tenure' } })}
+                                                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${data.loan_type === 'tenure' ? 'bg-white dark:bg-gray-600 shadow-sm text-indigo-600 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
+                                                >
+                                                    Tenure (Months)
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleLoanTypeChange({ target: { value: 'emi_amount' } })}
+                                                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${data.loan_type === 'emi_amount' ? 'bg-white dark:bg-gray-600 shadow-sm text-indigo-600 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
+                                                >
+                                                    EMI Amount
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                <TextInput
-                                    id="interest_rate"
-                                    onChange={(e) =>
-                                        setData("interest_rate", e.target.value)
-                                    }
-                                    type="text"
-                                    className="mt-1 block w-full"
-                                    autoComplete="interest_rate"
-                                />
-
-                                <InputError
-                                    message={errors.interest_rate}
-                                    className="mt-2"
-                                />
-                            </div>
-                            {/* Loan Type Toggle */}
-                            <div>
-                                <InputLabel value="Loan Payment Type" />
-                                <div className="flex gap-4 mt-2">
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="loan_type"
-                                            value="tenure"
-                                            checked={
-                                                data.loan_type === "tenure"
-                                            }
-                                            onChange={handleLoanTypeChange}
-                                        />
-                                        <span className="ml-2">Tenure</span>
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="loan_type"
-                                            value="emi_amount"
-                                            checked={
-                                                data.loan_type === "emi_amount"
-                                            }
-                                            onChange={handleLoanTypeChange}
-                                        />
-                                        <span className="ml-2">
-                                            Amount per EMI
-                                        </span>
-                                    </label>
+                                    <div className="md:col-span-2">
+                                        {data.loan_type === "tenure" ? (
+                                            <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <InputLabel htmlFor="tenure" value="Loan Tenure (Number of Months)" className="text-xs font-bold uppercase tracking-wider text-gray-500" />
+                                                <TextInput
+                                                    id="tenure"
+                                                    value={data.tenure}
+                                                    onChange={(e) => setData("tenure", e.target.value)}
+                                                    type="number"
+                                                    className="block w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-900"
+                                                    placeholder="e.g. 12, 24, 36"
+                                                    required
+                                                />
+                                                <InputError message={errors.tenure} className="mt-1" />
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <InputLabel htmlFor="emi_amount" value="Fixed EMI Amount (₹)" className="text-xs font-bold uppercase tracking-wider text-gray-500" />
+                                                <div className="relative">
+                                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                        <span className="text-gray-500 sm:text-sm">₹</span>
+                                                    </div>
+                                                    <TextInput
+                                                        id="emi_amount"
+                                                        value={data.emi_amount}
+                                                        onChange={(e) => setData("emi_amount", e.target.value)}
+                                                        type="number"
+                                                        className="block w-full pl-7 rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-900"
+                                                        placeholder="0.00"
+                                                        required
+                                                    />
+                                                </div>
+                                                <InputError message={errors.emi_amount} className="mt-1" />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Conditional Inputs */}
-                            {data.loan_type === "tenure" && (
-                                <div>
-                                    <InputLabel
-                                        htmlFor="tenure"
-                                        value="Tenure"
-                                    />
-                                    <TextInput
-                                        id="tenure"
-                                        name="tenure"
-                                        type="number"
-                                        value={data.tenure || ""}
-                                        onChange={
-                                            (e) =>
-                                                setData(
-                                                    "tenure",
-                                                    e.target.value
-                                                ) // Update tenure correctly
-                                        }
-                                        className="mt-1 block w-full"
-                                    />
-                                    <InputError
-                                        message={errors.tenure}
-                                        className="mt-2"
-                                    />
+                                <div className="pt-6 flex items-center justify-end space-x-3 border-t border-gray-100 dark:border-gray-700">
+                                    <Link
+                                        href={route("loan-detail.index")}
+                                        className="px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-bold uppercase tracking-widest text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                                    >
+                                        Cancel
+                                    </Link>
+                                    <button
+                                        type="submit"
+                                        disabled={data.processing}
+                                        className="inline-flex items-center px-8 py-2.5 rounded-xl border border-transparent bg-indigo-600 text-sm font-bold uppercase tracking-widest text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 transition-all hover:bg-indigo-700 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+                                    >
+                                        <FontAwesomeIcon icon={faSave} className="mr-2" />
+                                        Save Loan
+                                    </button>
                                 </div>
-                            )}
-
-                            {data.loan_type === "emi_amount" && (
-                                <div>
-                                    <InputLabel
-                                        htmlFor="emi_amount"
-                                        value="Amount per EMI"
-                                    />
-                                    <TextInput
-                                        id="emi_amount"
-                                        name="emi_amount"
-                                        type="number"
-                                        value={data.emi_amount || ""}
-                                        onChange={
-                                            (e) =>
-                                                setData(
-                                                    "emi_amount",
-                                                    e.target.value
-                                                ) // Update emi_amount correctly
-                                        }
-                                        className="mt-1 block w-full"
-                                    />
-                                    <InputError
-                                        message={errors.emi_amount}
-                                        className="mt-2"
-                                    />
-                                </div>
-                            )}
-                            <div>
-                                <InputLabel
-                                    htmlFor="date"
-                                    value="Disbursed Date"
-                                />
-
-                                <TextInput
-                                    id="date"
-                                    onChange={(e) =>
-                                        setData("date", e.target.value)
-                                    }
-                                    type="date"
-                                    className="mt-1 block w-full"
-                                    autoComplete="date"
-                                />
-
-                                <InputError
-                                    message={errors.date}
-                                    className="mt-2"
-                                />
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <button
-                                    type="submit"
-                                    className="bg-green-500 my-2 uppercase hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-                                >
-                                    Save
-                                </button>
-
-                                {/* <Transition
-                                show="{recentlySuccessful}"
-                                enter="transition ease-in-out"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out"
-                                leaveTo="opacity-0"
-                            >
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    Saved.
-                                </p>
-                            </Transition> */}
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

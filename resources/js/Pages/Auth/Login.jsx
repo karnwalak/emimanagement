@@ -5,6 +5,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -25,15 +27,24 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <Head title="Log in" />
 
+            <div className="mb-8 text-center">
+                <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                    Welcome Back
+                </h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    Enter your credentials to access your dashboard
+                </p>
+            </div>
+
             {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
+                <div className="mb-6 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 text-sm font-bold text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800 animate-pulse">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit}>
+            <form onSubmit={submit} className="space-y-6">
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="Email Address" className="font-bold text-gray-700 dark:text-gray-300" />
 
                     <TextInput
                         id="email"
@@ -41,6 +52,7 @@ export default function Login({ status, canResetPassword }) {
                         name="email"
                         value={data.email}
                         className="mt-1 block w-full"
+                        placeholder="your@email.com"
                         autoComplete="username"
                         isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
@@ -49,8 +61,18 @@ export default function Login({ status, canResetPassword }) {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                <div>
+                    <div className="flex justify-between items-center">
+                        <InputLabel htmlFor="password" value="Password" className="font-bold text-gray-700 dark:text-gray-300" />
+                        {canResetPassword && (
+                            <Link
+                                href={route('password.request')}
+                                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                            >
+                                Forgot password?
+                            </Link>
+                        )}
+                    </div>
 
                     <TextInput
                         id="password"
@@ -58,6 +80,7 @@ export default function Login({ status, canResetPassword }) {
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"
+                        placeholder="••••••••"
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
                     />
@@ -65,34 +88,39 @@ export default function Login({ status, canResetPassword }) {
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
-                            Remember me
-                        </span>
-                    </label>
+                <div className="flex items-center">
+                    <Checkbox
+                        name="remember"
+                        checked={data.remember}
+                        onChange={(e) =>
+                            setData('remember', e.target.checked)
+                        }
+                    />
+                    <span className="ms-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                        Stay logged in
+                    </span>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-100 dark:focus:ring-offset-gray-800"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
+                <div className="pt-2">
+                    <PrimaryButton
+                        className="w-full justify-center py-4 rounded-2xl text-lg font-black shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 active:scale-[0.98] transition-all"
+                        disabled={processing}
+                    >
+                        <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
+                        Sign In
                     </PrimaryButton>
+                </div>
+
+                <div className="text-center mt-8">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Don't have an account?{' '}
+                        <Link
+                            href={route('register')}
+                            className="font-black text-indigo-600 dark:text-indigo-400 hover:underline"
+                        >
+                            Create Account
+                        </Link>
+                    </p>
                 </div>
             </form>
         </GuestLayout>
