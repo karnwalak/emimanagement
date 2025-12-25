@@ -17,33 +17,25 @@ import {
     faUser
 } from "@fortawesome/free-solid-svg-icons";
 
-export default function Show({ mustVerifyEmail, user, loanDetail, emiDetail }) {
-    // const { data, setData, post, errors, reset } = useForm({
-    //     id: "",
-    //     checked: "",
-    //     _method: "PUT",
-    // });
+import DataTable from "datatables.net-react";
+import DT from "datatables.net-dt";
+import React, { useRef, useEffect } from "react";
 
+DataTable.use(DT);
+
+export default function Show({ mustVerifyEmail, user, loanDetail, emiDetail }) {
+    const tableRef = useRef();
     const [localEmiDetails, setLocalEmiDetails] = useState(emiDetail);
 
+    const changeStatus = (id, checked) => {
+        const newStatus = checked ? "paid" : "pending";
+        const emiId = id;
 
-
-    const changeStatus = (e) => {
-        e.preventDefault();
-        const newStatus = e.target.checked ? "paid" : "pending"; // Determine the new status based on whether the checkbox is checked
-        const emiId = e.target.value; // Get the EMI id from the checkbox value
-
-        console.log("EMI ID:", emiId);
-        console.log("New Status:", newStatus);
-
-        // You can now make an API call to update the status
-        // Example: You can send a POST request with the new status
         axios.put(route("emi-detail.update", loanDetail.id), {
             id: emiId,
-            status: newStatus, // Send the new status
+            status: newStatus,
         })
             .then((response) => {
-                // Handle the response after updating
                 setLocalEmiDetails((prevDetails) =>
                     prevDetails.map((emi) =>
                         emi.id === parseInt(emiId)
@@ -51,11 +43,181 @@ export default function Show({ mustVerifyEmail, user, loanDetail, emiDetail }) {
                             : emi
                     )
                 );
-                console.log(response);
             })
             .catch((error) => {
                 console.error("Error updating status:", error);
             });
+    };
+
+    // Make changeStatus available globally for DataTable render
+    useEffect(() => {
+        window.changeEmiStatus = (element) => {
+            changeStatus(element.value, element.checked);
+        };
+
+        const addCustomStyles = () => {
+            if (document.getElementById('datatable-custom-styles')) return;
+            const style = document.createElement('style');
+            style.id = 'datatable-custom-styles';
+            style.textContent = `
+                .dataTables_wrapper .dataTables_length, 
+                .dataTables_wrapper .dataTables_filter,
+                .dt-length, .dt-search {
+                    margin-bottom: 1.5rem !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 0.5rem !important;
+                }
+                
+                .dataTables_filter input, .dt-search input {
+                    border: 1px solid #e5e7eb !important;
+                    border-radius: 0.75rem !important;
+                    padding: 0.5rem 1rem !important;
+                    outline: none !important;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    background: #f9fafb !important;
+                    font-size: 0.875rem !important;
+                    min-width: 200px !important;
+                }
+
+                .dark .dataTables_filter input, .dark .dt-search input {
+                    background: #1f2937 !important;
+                    border-color: #374151 !important;
+                    color: #f9fafb !important;
+                }
+
+                .dataTables_length select, .dt-length select {
+                    border: 1px solid #e5e7eb !important;
+                    border-radius: 0.75rem !important;
+                    padding: 0.5rem 2.5rem 0.5rem 1rem !important;
+                    background-color: #f9fafb !important;
+                    font-size: 0.875rem !important;
+                    cursor: pointer !important;
+                }
+
+                .dark .dataTables_length select, .dark .dt-length select {
+                    background-color: #1f2937 !important;
+                    border-color: #374151 !important;
+                    color: #f9fafb !important;
+                }
+
+                .dataTables_paginate, .dt-paging {
+                    padding-top: 1.5rem !important;
+                    display: flex !important;
+                    justify-content: flex-end !important;
+                    flex-wrap: wrap !important;
+                    gap: 0.75rem !important;
+                }
+
+                .dataTables_paginate .paginate_button, .dt-paging .dt-paging-button {
+                    padding: 0.5rem 1rem !important;
+                    border: 1px solid #4f46e5 !important;
+                    border-radius: 0.75rem !important;
+                    cursor: pointer !important;
+                    background: white !important;
+                    color: #4f46e5 !important;
+                    font-weight: 600 !important;
+                    font-size: 0.875rem !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    min-width: 40px !important;
+                    text-decoration: none !important;
+                    margin: 2px !important;
+                    transition: all 0.2s ease !important;
+                }
+
+                .dark .dataTables_paginate .paginate_button, .dark .dt-paging .dt-paging-button {
+                    background: #1f2937 !important;
+                    border-color: #6366f1 !important;
+                    color: #a5b4fc !important;
+                }
+
+                .dataTables_paginate .paginate_button.current, .dt-paging .dt-paging-button.current {
+                    background: #4f46e5 !important;
+                    border-color: #4f46e5 !important;
+                    color: white !important;
+                }
+
+                .dataTables_paginate .paginate_button.disabled, .dt-paging .dt-paging-button.disabled {
+                    cursor: not-allowed !important;
+                    opacity: 0.4 !important;
+                }
+            `;
+            document.head.appendChild(style);
+        };
+
+        addCustomStyles();
+
+        return () => {
+            delete window.changeEmiStatus;
+        };
+    }, [localEmiDetails]);
+
+    const dataTableOptions = {
+        data: localEmiDetails,
+        columns: [
+            {
+                data: null,
+                render: (data, type, row, meta) => `<span class="font-bold text-gray-400">${meta.row + 1}.</span>`,
+                className: "px-6 py-4"
+            },
+            {
+                data: 'due_date',
+                render: (data) => new Date(data).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                className: "px-6 py-4 text-gray-900 dark:text-gray-200 font-medium"
+            },
+            {
+                data: 'amount',
+                render: (data) => `₹${parseFloat(data).toLocaleString()}`,
+                className: "px-6 py-4 text-right font-black text-gray-700 dark:text-gray-300"
+            },
+            {
+                data: 'status',
+                render: (data) => {
+                    const isPaid = data === 'paid';
+                    const colorClass = isPaid
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                    const icon = isPaid ? 'fa-check-circle' : 'fa-exclamation-circle';
+                    return `
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-tighter ${colorClass}">
+                            <i class="fas ${icon} mr-1"></i>
+                            ${data}
+                        </span>
+                    `;
+                },
+                className: "px-6 py-4 text-center"
+            },
+            {
+                data: null,
+                orderable: false,
+                render: (data, type, row) => `
+                    <div class="flex items-center justify-center">
+                        <input type="checkbox" 
+                               value="${row.id}" 
+                               ${row.status === 'paid' ? 'checked' : ''} 
+                               onchange="changeEmiStatus(this)"
+                               class="w-5 h-5 text-indigo-600 border-gray-300 rounded-lg focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 transition-all cursor-pointer" />
+                    </div>
+                `,
+                className: "px-6 py-4 text-center"
+            }
+        ],
+        pageLength: 5,
+        responsive: true,
+        dom: '<"flex justify-between items-center mb-4"lf>rt<"flex justify-between items-center mt-4"ip>',
+        language: {
+            search: "Search:",
+            lengthMenu: "Show _MENU_",
+            info: "Showing _START_ to _END_ of _TOTAL_",
+            paginate: {
+                first: "«",
+                last: "»",
+                next: "›",
+                previous: "‹"
+            }
+        }
     };
     return (
         <AuthenticatedLayout
@@ -94,8 +256,8 @@ export default function Show({ mustVerifyEmail, user, loanDetail, emiDetail }) {
                             <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Current Status</h4>
                             <div className="flex items-center gap-2">
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${loanDetail.status === 'active'
-                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                    : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                                     }`}>
                                     {loanDetail.status}
                                 </span>
@@ -188,8 +350,12 @@ export default function Show({ mustVerifyEmail, user, loanDetail, emiDetail }) {
                                     <h3 className="font-bold text-gray-900 dark:text-white">Repayment Schedule</h3>
                                     <span className="text-xs text-gray-500 font-medium">Auto-calculated based on disbursement</span>
                                 </div>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
+                                <div className="p-6 overflow-hidden">
+                                    <DataTable
+                                        ref={tableRef}
+                                        options={dataTableOptions}
+                                        className="w-full text-sm text-left"
+                                    >
                                         <thead>
                                             <tr className="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400">
                                                 <th className="px-6 py-4 font-bold uppercase text-xs tracking-wider">No.</th>
@@ -199,39 +365,7 @@ export default function Show({ mustVerifyEmail, user, loanDetail, emiDetail }) {
                                                 <th className="px-6 py-4 font-bold uppercase text-xs tracking-wider text-center">Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                            {localEmiDetails.map((emi, idx) => (
-                                                <tr key={emi.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                                    <td className="px-6 py-4 font-bold text-gray-400">{idx + 1}.</td>
-                                                    <td className="px-6 py-4 text-gray-900 dark:text-gray-200 font-medium">
-                                                        {new Date(emi.due_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right font-black text-gray-700 dark:text-gray-300">
-                                                        ₹{parseFloat(emi.amount).toLocaleString()}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-tighter ${emi.status === 'paid'
-                                                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                                                : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                            }`}>
-                                                            <FontAwesomeIcon icon={emi.status === 'paid' ? faCheckCircle : faExclamationCircle} className="mr-1" />
-                                                            {emi.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <div className="flex items-center justify-center">
-                                                            <Checkbox
-                                                                onChange={changeStatus}
-                                                                value={emi.id}
-                                                                checked={emi.status === "paid"}
-                                                                className="w-5 h-5 text-indigo-600 border-gray-300 rounded-lg focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 transition-all cursor-pointer"
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                    </DataTable>
                                 </div>
                             </div>
                         </div>
