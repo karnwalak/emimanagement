@@ -31,9 +31,12 @@ class SendEmiReminder extends Command
         // Get all emis which are due in next 7 days
         $emis = EmiDetail::where('due_date', '>=', now()->subDays(7))->where('due_date', '<=', now()->addDays(7))->get();
         if ($emis->count() > 0) {
+            // Send reminder to user for each emi with 10 seconds delay 
             foreach ($emis as $emi) {
+                $this->info('Sending reminder for EMI to ' . $emi->loanDetail->user->email);
                 $user = $emi->loanDetail->user;
                 $this->sendReminder($user, $emi);
+                sleep(10);
             }
         }
 
