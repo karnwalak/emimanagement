@@ -23,21 +23,25 @@ class GoogleAuthController extends Controller
 
             $googleUser = Socialite::driver('google')->user();
 
+            if (!$googleUser->getEmail()) {
+                throw new Exception('Email not provided by Google.');
+            }
+
             // If the user exists, update their record; otherwise, create a new one
-            $user = User::where('email', $googleUser->email)->first();
+            $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
                 // Update existing user with Google ID
                 $user->update([
-                    'google_id' => $googleUser->id,
-                    'name' => $googleUser->name,
+                    'google_id' => $googleUser->getId(),
+                    'name' => $googleUser->getName(),
                 ]);
             } else {
                 // Create new user
                 $user = User::create([
-                    'name' => $googleUser->name,
-                    'email' => $googleUser->email,
-                    'google_id' => $googleUser->id,
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
                     'password' => bcrypt('razorpod.in'),
                 ]);
             }
