@@ -7,6 +7,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
+import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -121,6 +122,26 @@ export default function Login({ status, canResetPassword }) {
                             Create Account
                         </Link>
                     </p>
+                </div>
+                <div className="relative py-4">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white dark:bg-gray-900 px-4 text-gray-500 font-black tracking-widest">
+                            Or continue with
+                        </span>
+                    </div>
+                </div>
+
+                <div className="pt-2">
+                    <a
+                        href={route('auth.google')}
+                        className="flex w-full items-center justify-center gap-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 py-4 px-4 text-sm font-black text-gray-700 dark:text-gray-200 transition-all hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 active:scale-[0.98]"
+                    >
+                        <FontAwesomeIcon icon={faGoogle} className="text-xl text-red-500" />
+                        <span>Sign in with Google</span>
+                    </a>
                 </div>
             </form>
         </GuestLayout>
