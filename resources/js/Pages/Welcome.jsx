@@ -179,10 +179,10 @@ export default function Welcome({ auth }) {
                     <p className="text-sm text-gray-500">
                         &copy; {new Date().getFullYear()} EMIPro Finance Tracking. All rights reserved.
                     </p>
-                    <div className="flex gap-6 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer">
-                        <span>Privacy</span>
-                        <span>Terms</span>
-                        <span>Support</span>
+                    <div className="flex gap-6 text-sm font-bold text-gray-600 dark:text-gray-400">
+                        <Link href={route('privacy')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Privacy</Link>
+                        <Link href={route('terms')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Terms</Link>
+                        <Link href={route('support')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Support</Link>
                     </div>
                 </div>
             </footer>

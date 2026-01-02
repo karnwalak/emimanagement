@@ -9,6 +9,7 @@ use App\Http\Controllers\EmiDetailController;
 use App\Http\Controllers\LoanDetailController;
 use App\Http\Controllers\Api\LoanDetailController as ApiLoanDetailController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\ContactFormController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -17,7 +18,22 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('welcome');
+
+Route::get('/privacy', function () {
+    return Inertia::render('Privacy');
+})->name('privacy');
+
+Route::get('/terms', function () {
+    return Inertia::render('Terms');
+})->name('terms');
+
+Route::get('/support', function () {
+    return Inertia::render('Support');
+})->name('support');
+
+Route::post('/submit-contact-form', [ContactFormController::class, 'submitContactForm'])->name('contact-form.submit');
+
 
 Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
 
