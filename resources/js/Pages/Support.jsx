@@ -1,4 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -19,6 +20,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Textarea from '@/Components/Textarea';
 import { useState, useEffect } from 'react';
+import Logo from '@/Components/Logo';
 
 export default function Support({ auth }) {
   const { flash } = usePage().props;
@@ -56,14 +58,18 @@ export default function Support({ auth }) {
       <nav className="fixed top-0 w-full z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 text-white">
-                <FontAwesomeIcon icon={faWallet} />
+            <Logo />
+            {/* <Link href={route('welcome')} className="flex items-center gap-3 group">
+              <ApplicationLogo className="h-10 w-auto rounded-md shadow-sm" />
+              <div className='flex flex-col leading-tight'>
+                <span className="text-lg font-black tracking-tight text-gray-900 dark:text-white">
+                  EMI<span className="text-indigo-600 group-hover:text-indigo-500 transition-colors">Pro</span>
+                </span>
+                <span className="text-[10px] tracking-wider font-medium text-gray-500 dark:text-gray-400">
+                  Your EMI, Under Control
+                </span>
               </div>
-              <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white uppercase">
-                EMI<span className="text-indigo-600">Pro</span>
-              </span>
-            </div>
+            </Link> */}
             <div className="flex items-center gap-4">
               <Link
                 href={route('welcome')}
@@ -336,12 +342,18 @@ export default function Support({ auth }) {
       {/* Footer */}
       <footer className="border-t border-gray-100 dark:border-gray-800 py-12 px-4 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2">
-            <img src="/logo/emipro_logo.png" alt="EMIPro Logo" className="h-8 w-auto rounded-md shadow-sm" />
-            <span className="text-lg font-black tracking-tight text-gray-900 dark:text-white uppercase">
-              EMI<span className="text-indigo-600">Pro</span>
-            </span>
-          </div>
+          {/* <Link href={route('welcome')} className="flex items-center gap-3 group">
+            <ApplicationLogo className="h-10 w-auto rounded-md shadow-sm" />
+            <div className='flex flex-col leading-tight'>
+              <span className="text-lg font-black tracking-tight text-gray-900 dark:text-white">
+                EMI<span className="text-indigo-600 group-hover:text-indigo-500 transition-colors">Pro</span>
+              </span>
+              <span className="text-[10px] tracking-wider font-medium text-gray-500 dark:text-gray-400">
+                Your EMI, Under Control
+              </span>
+            </div>
+          </Link> */}
+          <Logo />
           <p className="text-sm text-gray-500">
             &copy; {new Date().getFullYear()} EMIPro Finance Tracking. All rights reserved.
           </p>

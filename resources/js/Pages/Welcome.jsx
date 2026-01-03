@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import NavBar from '@/Components/NavBar';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faWallet,
@@ -8,6 +9,7 @@ import {
     faSignInAlt,
     faUserPlus
 } from "@fortawesome/free-solid-svg-icons";
+import Logo from '@/Components/Logo';
 
 export default function Welcome({ auth }) {
     return (
@@ -15,43 +17,7 @@ export default function Welcome({ auth }) {
             <Head title="Premium EMI Management" />
 
             {/* Navigation */}
-            <nav className="fixed top-0 w-full z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg border-b border-gray-100 dark:border-gray-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-20 items-center">
-                        <div className="flex items-center gap-2">
-                            <img src="/logo/emipro_logo.png" alt="EMIPro Logo" className="h-8 w-auto rounded-md shadow-sm" />
-                            <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white uppercase">
-                                EMI<span className="text-indigo-600">Pro</span>
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            {auth.user ? (
-                                <Link
-                                    href={route('dashboard')}
-                                    className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold transition-all hover:bg-indigo-700 hover:shadow-lg active:scale-95"
-                                >
-                                    Go to Dashboard
-                                </Link>
-                            ) : (
-                                <>
-                                    <Link
-                                        href={route('login')}
-                                        className="text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                                    >
-                                        Log In
-                                    </Link>
-                                    <Link
-                                        href={route('register')}
-                                        className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold transition-all hover:bg-indigo-700 hover:shadow-lg active:scale-95"
-                                    >
-                                        Get Started
-                                    </Link>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <NavBar />
 
             {/* Hero Section */}
             <main className="relative pt-32 pb-20 px-4">
@@ -73,20 +39,31 @@ export default function Welcome({ auth }) {
                             The professional way to track, manage, and optimize your loan repayments. Stay ahead of your dues with our premium dashboard.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                            <Link
-                                href={route('register')}
-                                className="px-8 py-4 rounded-2xl bg-indigo-600 text-white font-black text-lg shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 hover:bg-indigo-700 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
-                            >
-                                <FontAwesomeIcon icon={faUserPlus} />
-                                Start Free Trial
-                            </Link>
-                            <Link
-                                href={route('login')}
-                                className="px-8 py-4 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-black text-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all active:scale-95 flex items-center justify-center gap-2"
-                            >
-                                <FontAwesomeIcon icon={faSignInAlt} />
-                                Member Log In
-                            </Link>
+                            {auth?.user ? (
+                                <Link
+                                    href={route('dashboard')}
+                                    className="px-8 py-4 rounded-2xl bg-indigo-600 text-white font-black text-lg shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 hover:bg-indigo-700 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    Go to Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link
+                                        href={route('register')}
+                                        className="px-8 py-4 rounded-2xl bg-indigo-600 text-white font-black text-lg shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 hover:bg-indigo-700 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2"
+                                    >
+                                        <FontAwesomeIcon icon={faUserPlus} />
+                                        Start Free Trial
+                                    </Link>
+                                    <Link
+                                        href={route('login')}
+                                        className="px-8 py-4 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-black text-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                    >
+                                        <FontAwesomeIcon icon={faSignInAlt} />
+                                        Member Log In
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -166,12 +143,13 @@ export default function Welcome({ auth }) {
             {/* Final Footer */}
             <footer className="border-t border-gray-100 dark:border-gray-800 py-12 px-4 bg-white dark:bg-gray-900">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                         <img src="/logo/emipro_logo.png" alt="EMIPro Logo" className="h-8 w-auto rounded-md shadow-sm" />
                         <span className="text-lg font-black tracking-tight text-gray-900 dark:text-white uppercase">
                             EMI<span className="text-indigo-600">Pro</span>
                         </span>
-                    </div>
+                    </div> */}
+                    <Logo />
                     <p className="text-sm text-gray-500">
                         &copy; {new Date().getFullYear()} EMIPro Finance Tracking. All rights reserved.
                     </p>

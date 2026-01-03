@@ -22,11 +22,10 @@ export default function Dashboard({ loanDetails }) {
         const list = Array.isArray(loanDetails) ? loanDetails : (loanDetails?.data || []);
 
         if (list.length === 0) return { active: 0, total: 0, pending: 0 };
-
         const activeLoans = list.filter(l => l.status !== 'closed').length;
         const totalAmount = list.reduce((sum, l) => sum + parseFloat(l.amount || 0), 0);
         const pendingEmis = list.reduce((sum, l) => {
-            const paid = l.emi_detail ? l.emi_detail.filter(e => e.status === 'paid').length : 0;
+            const paid = l.emi_details ? l.emi_details.filter(e => e.status == 'paid').length : 0;
             return sum + (parseInt(l.emi_count || 0) - paid);
         }, 0);
 
