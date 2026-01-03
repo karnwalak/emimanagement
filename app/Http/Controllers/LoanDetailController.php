@@ -23,19 +23,19 @@ class LoanDetailController extends Controller
         // $loanDetail = LoanDetail::get();
         // return Inertia::render('LoanDetail',compact('loanDetail'));
 
-        $query = LoanDetail::where('user_id',Auth::user()->id);
-        $sortField = request('sort_field','created_at');
+        $query = LoanDetail::where('user_id', Auth::user()->id);
+        $sortField = request('sort_field', 'created_at');
         $sortDirection = request('sort_direction', 'desc');
-        if(request('name')){
-            $query->where('name','like','%'.request('name').'%');
+        if (request('name')) {
+            $query->where('name', 'like', '%' . request('name') . '%');
         }
-        if(request('status')){
-            $query->where('status',request('status'));
+        if (request('status')) {
+            $query->where('status', request('status'));
         }
-        $LoanDetails = $query->orderBy($sortField,$sortDirection)->paginate(10)->onEachSide(1);
+        $LoanDetails = $query->orderBy($sortField, $sortDirection)->paginate(10)->onEachSide(1);
         // dd(LoanDetailResource::collection($LoanDetails));
-        return inertia('LoanDetail',[
-            'loanDetails'=>LoanDetailResource::collection($LoanDetails),
+        return inertia('LoanDetail', [
+            'loanDetails' => LoanDetailResource::collection($LoanDetails),
             'queryParams' => request()->query() ?: null,
             'success' => session('success')
         ]);
@@ -46,8 +46,8 @@ class LoanDetailController extends Controller
      */
     public function create()
     {
-        $users = User::select('id','name')->get();
-        return inertia('Create',compact('users'));
+        $users = User::select('id', 'name')->get();
+        return inertia('Create', compact('users'));
     }
 
     /**
@@ -61,23 +61,52 @@ class LoanDetailController extends Controller
         $remainingAmount = 0;
 
         if ($loanType == 'tenure') {
-            $annualInterestRate = $interestRate; // as % e.g. 10.5
+            $annualInterestRate = (float) $interestRate; // as % e.g. 10.5
             $monthlyRate = $annualInterestRate / 12 / 100; // convert to monthly decimal
 
-            // EMI Formula
-            $emiAmount = ($amount * $monthlyRate * pow(1 + $monthlyRate, $tenure)) /
-                (pow(1 + $monthlyRate, $tenure) - 1);
+            // Guard against invalid tenure
+            if ((int) $tenure <= 0) {
+                // No EMIs can be calculated with non-positive tenure
+                $emiAmount = 0;
+                $totalAmount = (float) $amount;
+                $emiCount = 0;
+            } elseif ($monthlyRate == 0.0) {
+                // Zero-interest loan: EMI is simple principal divided by tenure
+                $emiAmount = (float) $amount / (int) $tenure;
+                $totalAmount = (float) $amount; // No interest added
+                $emiCount = (int) $tenure;
+            } else {
+                // Standard EMI formula for non-zero interest
+                $factor = pow(1 + $monthlyRate, (int) $tenure);
+                $denominator = $factor - 1;
 
-            $totalAmount = $emiAmount * $tenure; // Total repayment amount
-            $emiCount = $tenure; // Total number of EMIs
+                // Extra safety against rare numerical edge case
+                if ($denominator == 0.0) {
+                    $emiAmount = (float) $amount / (int) $tenure;
+                } else {
+                    $emiAmount = ((float) $amount * $monthlyRate * $factor) / $denominator;
+                }
+
+                $totalAmount = $emiAmount * (int) $tenure; // Total repayment amount
+                $emiCount = (int) $tenure; // Total number of EMIs
+            }
         }
 
         if ($loanType == 'emi_amount') {
             $interest = 0;
-            $totalAmount = $amount + $interest;
-            $emiCount = $totalAmount / $emiAmountPre;
-            $remainingAmount = $totalAmount % $emiAmountPre;
-            $emiAmount = $emiAmountPre;
+            $totalAmount = (float) $amount + $interest;
+            $emiAmountPre = (float) $emiAmountPre;
+
+            if ($emiAmountPre > 0) {
+                $emiCount = (int) floor($totalAmount / $emiAmountPre);
+                $remainingAmount = $totalAmount - ($emiCount * $emiAmountPre);
+                $emiAmount = $emiAmountPre;
+            } else {
+                // Invalid EMI amount provided; keep counts at 0 to avoid division by zero
+                $emiCount = 0;
+                $remainingAmount = 0;
+                $emiAmount = 0;
+            }
         }
 
         return [
@@ -213,13 +242,13 @@ class LoanDetailController extends Controller
         $user = $loanDetail->user;
         return inertia('Show', compact('user', 'loanDetail', 'emiDetail'));
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(LoanDetail $loanDetail)
     {
-        $emiDetail = $loanDetail->emiDetail->select('id','loan_detail_id', 'amount', 'due_date','status');
+        $emiDetail = $loanDetail->emiDetail->select('id', 'loan_detail_id', 'amount', 'due_date', 'status');
         return inertia('Edit', compact('loanDetail', 'emiDetail'));
     }
 
@@ -228,7 +257,7 @@ class LoanDetailController extends Controller
      */
     public function destroy(LoanDetail $loanDetail)
     {
-        if($loanDetail){
+        if ($loanDetail) {
             $loanDetail->emiDetail()->delete();
             $loanDetail->delete();
         }
@@ -241,8 +270,8 @@ class LoanDetailController extends Controller
         // dd($loanDetail);
         if ($loanDetail) {
             $emiDetails = EmiDetail::where('loan_detail_id', $loanDetail->id)
-            ->where('status', 'pending')
-            ->update(['status' => 'paid']);
+                ->where('status', 'pending')
+                ->update(['status' => 'paid']);
 
             $loanDetail->status = 'closed';
             $loanDetail->save();

@@ -256,6 +256,25 @@ export default function Dashboard({ loanDetails }) {
                     align-items: center !important;
                     gap: 0.5rem !important;
                 }
+
+                /* Label color for Length Menu and Search text */
+                .dataTables_length label, .dt-length label {
+                    color: #6b7280 !important; /* indigo-600 */
+                    font-weight: 600 !important;
+                }
+
+                .dark .dataTables_length label, .dark .dt-length label {
+                    color: #6b7280 !important; /* indigo-300 */
+                }
+
+                .dataTables_filter label, .dt-search label {
+                    color: #6b7280 !important; /* indigo-600 */
+                    font-weight: 600 !important;
+                }
+
+                .dark .dataTables_filter label, .dark .dt-search label {
+                    color: #6b7280 !important; /* indigo-300 */
+                }
                 
                 .dataTables_filter input, .dt-search input {
                     border: 1px solid #e5e7eb !important;
