@@ -337,9 +337,7 @@ export default function Support({ auth }) {
       <footer className="border-t border-gray-100 dark:border-gray-800 py-12 px-4 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-sm">
-              <FontAwesomeIcon icon={faWallet} />
-            </div>
+            <img src="/logo/emipro_logo.png" alt="EMIPro Logo" className="h-8 w-auto rounded-md shadow-sm" />
             <span className="text-lg font-black tracking-tight text-gray-900 dark:text-white uppercase">
               EMI<span className="text-indigo-600">Pro</span>
             </span>

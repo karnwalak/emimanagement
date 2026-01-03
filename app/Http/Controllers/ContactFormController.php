@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactForm;
+use App\Mail\ContactFormReceived;
+use App\Notifications\ContactRecieved;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class ContactFormController extends Controller
 {
@@ -24,21 +27,29 @@ class ContactFormController extends Controller
             // Auto-detect priority based on keywords
             $priority = $this->detectPriority($request->subject, $request->message);
 
-            ContactForm::create([
+            $contactForm = ContactForm::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'subject' => $request->subject,
                 'message' => $request->message,
-                'user_id' => auth()->id(), // Capture authenticated user if logged in
+                'user_id' => auth()->id(), // Capture authenticated user if logged in, null for guests
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'priority' => $priority,
                 'status' => 'new',
             ]);
 
+            // Send confirmation email to the user
+            try {
+                Mail::to('recipient@email.com')->send(new ContactFormReceived($contactForm));
+            } catch (\Exception $e) {
+                Log::error('Failed to send confirmation email: ' . $e->getMessage());
+                // Don't fail the form submission if email fails
+            }
+
             return redirect()->back()->with('success', 'Thank you for contacting us! We have received your message and will get back to you within 24 hours.');
         } catch (\Throwable $th) {
-            \Log::error('Contact form submission failed: ' . $th->getMessage());
+            Log::error('Contact form submission failed: ' . $th->getMessage());
             return redirect()->back()->with('error', 'Failed to send message. Please try again or contact us directly at support@emipro.com');
         }
     }
