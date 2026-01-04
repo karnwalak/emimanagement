@@ -551,7 +551,7 @@ export default function Dashboard({ loanDetails }) {
             <div className="py-8">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center">
                                 <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
@@ -585,7 +585,7 @@ export default function Dashboard({ loanDetails }) {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700">
                         <div className="p-8">
@@ -599,7 +599,7 @@ export default function Dashboard({ loanDetails }) {
                                         <th className="px-4 py-4 font-bold tracking-wider">#</th>
                                         <th className="px-4 py-4 font-bold tracking-wider">Provider</th>
                                         <th className="px-4 py-4 font-bold tracking-wider">Amount</th>
-                                        <th className="px-4 py-4 font-bold tracking-wider">Prof. Fee</th>
+                                        <th className="px-4 py-4 font-bold tracking-wider">Pros. Fee</th>
                                         <th className="px-4 py-4 font-bold tracking-wider">Payout</th>
                                         <th className="px-4 py-4 font-bold tracking-wider">Interest</th>
                                         <th className="px-4 py-4 font-bold tracking-wider">EMIs</th>

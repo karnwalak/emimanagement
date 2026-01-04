@@ -3,13 +3,15 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTachometerAlt,
   faHandHoldingUsd,
   faUserCircle,
-  faSignOutAlt
+  faSignOutAlt,
+  faSun,
+  faMoon
 } from "@fortawesome/free-solid-svg-icons";
 import Logo from './Logo';
 
@@ -17,6 +19,26 @@ export default function NavBar() {
   const { auth } = usePage().props;
   const user = auth?.user;
   const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+
+  // Theme Toggle Logic
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) return savedTheme;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light'; // Default
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-lg border-b border-gray-100 dark:border-gray-800">
@@ -49,6 +71,15 @@ export default function NavBar() {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+              aria-label="Toggle Dark Mode"
+            >
+              <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} className="text-xl" />
+            </button>
+
             {user ? (
               <div className="hidden sm:flex sm:items-center">
                 <div className="relative ms-3">
