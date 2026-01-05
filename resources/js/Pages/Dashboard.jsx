@@ -16,6 +16,18 @@ import {
     faMoneyBillWave,
     faCoins
 } from "@fortawesome/free-solid-svg-icons";
+import {
+    Chart as ChartJS,
+    ArcElement,
+    Tooltip,
+    Legend,
+    CategoryScale,
+    LinearScale,
+    BarElement
+} from 'chart.js';
+import { Doughnut, Bar } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 export default function Dashboard({ stats }) {
     const { auth } = usePage().props;
@@ -116,6 +128,155 @@ export default function Dashboard({ stats }) {
                             gradient="bg-gradient-to-br from-rose-500 to-rose-700"
                             subText="Remaining principal balance"
                         />
+                    </div>
+
+                    {/* Chart Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Repayment Progress Chart */}
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+                                    <FontAwesomeIcon icon={faChartLine} />
+                                </div>
+                                <h3 className="text-lg font-black text-gray-900 dark:text-white">Repayment Progress</h3>
+                            </div>
+                            <div className="h-64 flex items-center justify-center relative">
+                                <Doughnut
+                                    data={{
+                                        labels: ['Paid', 'Remaining'],
+                                        datasets: [{
+                                            data: [stats.paid_amount, stats.remaining_amount],
+                                            backgroundColor: ['#10B981', '#F43F5E'],
+                                            borderWidth: 0,
+                                            hoverOffset: 4
+                                        }]
+                                    }}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: {
+                                                position: 'bottom',
+                                                labels: { usePointStyle: true, padding: 20 }
+                                            }
+                                        },
+                                        cutout: '75%'
+                                    }}
+                                />
+                                {/* Center Text */}
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">Paid</span>
+                                    <span className="text-xl font-black text-gray-900 dark:text-white">
+                                        {Math.round((stats.paid_amount / stats.total_amount) * 100) || 0}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Loan Distribution Chart */}
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+                                    <FontAwesomeIcon icon={faList} />
+                                </div>
+                                <h3 className="text-lg font-black text-gray-900 dark:text-white">Portfolio Distribution</h3>
+                            </div>
+                            <div className="h-64 flex items-center justify-center relative">
+                                <Doughnut
+                                    data={{
+                                        labels: ['Active', 'Closed', 'Overdue'],
+                                        datasets: [{
+                                            data: [stats.total_open_loan, stats.total_closed_loan, stats.total_overdue_loan],
+                                            backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+                                            borderWidth: 0,
+                                            hoverOffset: 4
+                                        }]
+                                    }}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: {
+                                                position: 'bottom',
+                                                labels: { usePointStyle: true, padding: 20 }
+                                            }
+                                        },
+                                        cutout: '75%'
+                                    }}
+                                />
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">Total</span>
+                                    <span className="text-xl font-black text-gray-900 dark:text-white">{stats.total_loan}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Monthly Trends Chart */}
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                <FontAwesomeIcon icon={faChartLine} />
+                            </div>
+                            <h3 className="text-lg font-black text-gray-900 dark:text-white">Monthly Payment History</h3>
+                        </div>
+                        <div className="h-80 w-full relative">
+                            <Bar
+                                data={{
+                                    labels: Object.keys(stats.monthly_chart || {}),
+                                    datasets: [{
+                                        label: 'Amount Paid',
+                                        data: Object.values(stats.monthly_chart || {}),
+                                        backgroundColor: '#6366F1',
+                                        borderRadius: 6,
+                                        hoverBackgroundColor: '#4F46E5'
+                                    }]
+                                }}
+                                options={{
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltip: {
+                                            backgroundColor: '#1F2937',
+                                            padding: 12,
+                                            titleFont: { size: 13 },
+                                            bodyFont: { size: 14, weight: 'bold' },
+                                            callbacks: {
+                                                label: function (context) {
+                                                    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(context.raw);
+                                                }
+                                            }
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            grid: {
+                                                display: true,
+                                                color: 'rgba(0,0,0,0.05)'
+                                            },
+                                            ticks: {
+                                                font: { size: 11 },
+                                                callback: function (value) {
+                                                    return new Intl.NumberFormat('en-IN', { notation: "compact", compactDisplay: "short" }).format(value);
+                                                }
+                                            }
+                                        },
+                                        x: {
+                                            grid: {
+                                                display: false
+                                            },
+                                            ticks: {
+                                                font: { size: 11 }
+                                            }
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
 
                     {/* Middle Row: Detailed Breakdown */}

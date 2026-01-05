@@ -42,6 +42,19 @@ class DashboardController extends Controller
             'total_overdue_loan' => LoanDetail::where('user_id', $userId)->whereHas('emiDetail', function ($q) {
                 $q->where('status', 'pending')->where('due_date', '<', now());
             })->count(),
+
+            'monthly_chart' => EmiDetail::whereHas('loanDetail', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            })
+            ->where('status', 'paid')
+            ->orderBy('due_date')
+            ->get()
+            ->groupBy(function($item) {
+                return \Carbon\Carbon::parse($item->due_date)->format('M Y');
+            })
+            ->map(function($group) {
+                return $group->sum('amount');
+            }),
         ];
 
         return inertia('Dashboard', [
