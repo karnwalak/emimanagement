@@ -33,7 +33,7 @@ export default function Login({ status, canResetPassword }) {
             if (window.turnstile && turnstileRef.current) {
                 turnstileRef.current.innerHTML = '';
                 window.turnstile.render(turnstileRef.current, {
-                    sitekey: '0x4AAAAAACK5F8rD67apEfVP', // Replace with your actual site key
+                    sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY, // Add from env file
                     callback: (token) => {
                         setData('cfTurnstileResponse', token);
                     },
