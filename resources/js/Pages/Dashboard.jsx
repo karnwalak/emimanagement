@@ -146,7 +146,7 @@ export default function Dashboard({ stats }) {
                                         labels: ['Paid', 'Remaining'],
                                         datasets: [{
                                             data: [stats.paid_amount, stats.remaining_amount],
-                                            backgroundColor: ['#10B981', '#F43F5E'],
+                                            backgroundColor: ['#10B981', '#b91010ef'],
                                             borderWidth: 0,
                                             hoverOffset: 4
                                         }]
@@ -176,6 +176,7 @@ export default function Dashboard({ stats }) {
                         {/* Loan Distribution Chart */}
                         <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-xl border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center gap-3 mb-6">
+
                                 <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
                                     <FontAwesomeIcon icon={faList} />
                                 </div>
@@ -187,7 +188,7 @@ export default function Dashboard({ stats }) {
                                         labels: ['Active', 'Closed', 'Overdue'],
                                         datasets: [{
                                             data: [stats.total_open_loan, stats.total_closed_loan, stats.total_overdue_loan],
-                                            backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+                                            backgroundColor: ['#3B82F6', '#b91010ef', '#F59E0B'],
                                             borderWidth: 0,
                                             hoverOffset: 4
                                         }]

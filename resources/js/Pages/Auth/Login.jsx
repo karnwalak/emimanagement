@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import Checkbox from '@/Components/Checkbox';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -14,6 +15,7 @@ export default function Login({ status, canResetPassword }) {
         email: '',
         password: '',
         remember: false,
+        cfTurnstileResponse: ''
     });
 
     const submit = (e) => {
@@ -23,6 +25,34 @@ export default function Login({ status, canResetPassword }) {
             onFinish: () => reset('password'),
         });
     };
+
+    const turnstileRef = useRef(null);
+
+    useEffect(() => {
+        const renderTurnstile = () => {
+            if (window.turnstile && turnstileRef.current) {
+                turnstileRef.current.innerHTML = '';
+                window.turnstile.render(turnstileRef.current, {
+                    sitekey: '0x4AAAAAACK5F8rD67apEfVP', // Replace with your actual site key
+                    callback: (token) => {
+                        setData('cfTurnstileResponse', token);
+                    },
+                });
+            }
+        };
+
+        if (window.turnstile) {
+            renderTurnstile();
+        } else {
+            const interval = setInterval(() => {
+                if (window.turnstile) {
+                    clearInterval(interval);
+                    renderTurnstile();
+                }
+            }, 100);
+            return () => clearInterval(interval);
+        }
+    }, []);
 
     return (
         <GuestLayout>
@@ -100,6 +130,13 @@ export default function Login({ status, canResetPassword }) {
                     <span className="ms-2 text-sm font-medium text-gray-600 dark:text-gray-400">
                         Stay logged in
                     </span>
+                </div>
+
+                <div className="mt-4 flex justify-start">
+                    <div
+                        className="cf-turnstile"
+                        ref={turnstileRef}
+                    ></div>
                 </div>
 
                 <div className="pt-2">
