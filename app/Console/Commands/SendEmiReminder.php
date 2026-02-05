@@ -29,7 +29,12 @@ class SendEmiReminder extends Command
     public function handle()
     {
         // Get all emis which are due in next 7 days
-        $emis = EmiDetail::where('due_date', '>=', now()->subDays(7))->where('due_date', '<=', now()->addDays(7))->get();
+        // $emis = EmiDetail::where('status','pending')->where('due_date', '>=', now()->subDays(7))->where('due_date', '<=', now()->addDays(7))->get();
+        $emis = EmiDetail::where([
+            ['status', '=', 'pending'],
+            ['due_date', '>=', now()->subDays(7)],
+            ['due_date', '<=', now()->addDays(7)],
+        ])->get();
         if ($emis->count() > 0) {
             // Send reminder to user for each emi with 10 seconds delay 
             foreach ($emis as $emi) {
