@@ -14,7 +14,7 @@ import Logo from '@/Components/Logo';
 export default function Welcome({ auth }) {
     return (
         <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] selection:bg-indigo-500 selection:text-white overflow-hidden">
-            <Head title="Premium EMI Management" />
+            <Head title="EMI Management Platform" />
 
             {/* Navigation */}
             <NavBar />
@@ -33,10 +33,10 @@ export default function Welcome({ auth }) {
                         </div>
                         <h1 className="text-5xl lg:text-7xl font-black text-gray-900 dark:text-white leading-[1.1] tracking-tight">
                             Take Control of Your <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">EMI Journey</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">EMI Portfolio</span>
                         </h1>
                         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto lg:mx-0">
-                            The professional way to track, manage, and optimize your loan repayments. Stay ahead of your dues with our premium dashboard.
+                            The professional way to track, manage, and optimize your loan repayments. Stay ahead of your dues with our comprehensive EMI Management platform.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                             {auth?.user ? (
@@ -135,7 +135,7 @@ export default function Welcome({ auth }) {
                         </div>
                     </div>
                     <p className="text-gray-500 dark:text-gray-400 font-medium">
-                        Join thousands of users who have streamlined their finances with EMIPro.
+                        Join thousands of users who have streamlined their finances with our EMI Management platform.
                     </p>
                 </div>
             </main>
@@ -143,15 +143,9 @@ export default function Welcome({ auth }) {
             {/* Final Footer */}
             <footer className="border-t border-gray-100 dark:border-gray-800 py-12 px-4 bg-white dark:bg-gray-900">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                    {/* <div className="flex items-center gap-2">
-                        <img src="/logo/emipro_logo.png" alt="EMIPro Logo" className="h-8 w-auto rounded-md shadow-sm" />
-                        <span className="text-lg font-black tracking-tight text-gray-900 dark:text-white uppercase">
-                            EMI<span className="text-indigo-600">Pro</span>
-                        </span>
-                    </div> */}
                     <Logo />
                     <p className="text-sm text-gray-500">
-                        &copy; {new Date().getFullYear()} EMIPro Finance Tracking. All rights reserved.
+                        &copy; {new Date().getFullYear()} EMI Management Platform. All rights reserved.
                     </p>
                     <div className="flex gap-6 text-sm font-bold text-gray-600 dark:text-gray-400">
                         <Link href={route('privacy')} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Privacy</Link>
