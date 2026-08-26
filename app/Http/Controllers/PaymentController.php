@@ -6,6 +6,8 @@ use inertia;
 use Razorpay\Api\Api;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Razorpay\Api\Errors\SignatureVerificationError;
 
 class PaymentController extends Controller
 {
@@ -36,7 +38,28 @@ class PaymentController extends Controller
         ];
 
         $api = new Api(env('RAZORPAY_KEY_ID'), env('RAZORPAY_KEY_SECRET'));
-        $isVerified = $api->utility->verifyPaymentSignature($attributes);
-        dd($isVerified);
+
+        try {
+            $api->utility->verifyPaymentSignature($attributes);
+        } catch (SignatureVerificationError $e) {
+            // A forged or tampered signature throws here — this is the
+            // expected outcome for a bad/faked payment, not a server error,
+            // so it must not surface as an unhandled 500.
+            Log::warning('Razorpay signature verification failed', [
+                'razorpay_order_id' => $attributes['razorpay_order_id'],
+                'razorpay_payment_id' => $attributes['razorpay_payment_id'],
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Payment verification failed.',
+            ], 400);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Payment verified successfully.',
+        ]);
     }
 }

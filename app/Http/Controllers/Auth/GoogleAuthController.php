@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Exception;
 use App\Models\User;
@@ -49,7 +50,15 @@ class GoogleAuthController extends Controller
             return redirect()->route('dashboard');
 
         } catch (Exception $e) {
-            dd($e);
+            // dd() here would render a full stack trace — including
+            // environment values — to whoever hit this callback. Log it
+            // server-side and send the user back to login with a generic
+            // message instead.
+            Log::error('Google login failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()->route('login')->with('error', 'Unable to sign in with Google. Please try again.');
         }
     }
 }
