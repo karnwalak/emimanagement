@@ -1,0 +1,61 @@
+# Cloud Build configuration for EMIManagement.
+#
+# Optional. Building locally with Docker and pushing (see the deployment guide,
+# Part 6, Option A) consumes zero Cloud Build minutes and is the cheapest path on
+# the Free Tier. Use this file when you want the build to happen in Google's
+# infrastructure instead — e.g. from a laptop without Docker, or from a trigger.
+#
+# Manual run:
+#   gcloud builds submit --config=cloudbuild.yaml \
+#     --substitutions=_TAG=$(git rev-parse --short HEAD),_TURNSTILE_SITE_KEY=0x4AAA...
+
+substitutions:
+  _REGION: asia-south1
+  _REPO: emi-repo
+  _IMAGE: emimanagement
+
+  # Image tag. Defaults to "latest" so a bare `gcloud builds submit` works.
+  #
+  # Do NOT use $SHORT_SHA or $COMMIT_SHA here: those are populated only for
+  # builds started by a Cloud Build *trigger*. In a manual submit they expand to
+  # an empty string, producing an image reference that ends in a bare colon and
+  # fails with a confusing "invalid reference format".
+  _TAG: latest
+
+  # Cloudflare Turnstile SITE key (public by design — it is embedded in the page
+  # HTML for every visitor). Vite inlines it into the JS bundle at build time, so
+  # it cannot be supplied later as a Cloud Run environment variable.
+  # The Turnstile SECRET key is a runtime env var and must never appear here.
+  _TURNSTILE_SITE_KEY: ""
+  _APP_NAME: "EMI Management"
+
+steps:
+  # Two tags per build:
+  #   ${_TAG}          - the moving pointer you deploy from (e.g. "latest")
+  #   build-$BUILD_ID  - permanently unique, so there is always something
+  #                      specific to roll back to even when ${_TAG} has moved.
+  # $BUILD_ID is populated for manual submits as well as triggers.
+  - name: 'gcr.io/cloud-builders/docker'
+    id: build
+    args:
+      - build
+      - --build-arg=VITE_APP_NAME=${_APP_NAME}
+      - --build-arg=VITE_TURNSTILE_SITE_KEY=${_TURNSTILE_SITE_KEY}
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${_TAG}
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:build-$BUILD_ID
+      - .
+
+# Pushed only if the build step succeeds.
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:${_TAG}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_IMAGE}:build-$BUILD_ID'
+
+options:
+  # machineType is deliberately NOT set. The free monthly Cloud Build allowance
+  # applies to the default machine type only; selecting a larger one (E2_HIGHCPU_8
+  # and friends) makes every minute of every build billable.
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 1800s

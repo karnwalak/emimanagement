@@ -1,0 +1,68 @@
+# Everything here is excluded from the build context sent to the Docker daemon
+# (and, via `gcloud builds submit`, uploaded to Cloud Build).
+#
+# Two reasons this file matters more than usual:
+#   1. node_modules + vendor are ~200MB and are rebuilt inside the image anyway.
+#   2. .env and emimanagement.sql contain real credentials and real user data.
+#      A COPY . that pulls them in bakes them into an image layer, where they
+#      remain readable by anyone who can pull the image — even if a later layer
+#      deletes the file.
+
+# --- secrets and data: must never enter an image -----------------------------
+.env
+.env.*
+!.env.example
+auth.json
+*.pem
+*.key
+.rnd
+emimanagement.sql
+
+# --- rebuilt inside the image ------------------------------------------------
+node_modules
+vendor
+public/build
+public/hot
+public/storage
+
+# --- local state -------------------------------------------------------------
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/public/*
+storage/pail
+bootstrap/cache/*
+
+# --- VCS, CI and tooling -----------------------------------------------------
+.git
+.gitignore
+.gitattributes
+.github
+.claude
+.editorconfig
+.dockerignore
+.gcloudignore
+Dockerfile
+docker-compose*.yml
+cloudbuild.yaml
+
+# --- tests and docs: not needed at runtime -----------------------------------
+tests
+phpunit.xml
+.phpunit.cache
+.phpunit.result.cache
+docs
+README.md
+MIGRATION.md
+
+# --- editor / OS noise -------------------------------------------------------
+.idea
+.vscode
+.fleet
+.nova
+.zed
+.DS_Store
+Thumbs.db
+npm-debug.log
+yarn-error.log

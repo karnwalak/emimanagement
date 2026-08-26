@@ -1,0 +1,49 @@
+# Controls what `gcloud builds submit` uploads to Cloud Build.
+#
+# gcloud's default behaviour is to read .gitignore and skip anything it lists.
+# That default is unsafe here: .env is gitignored (so it would be skipped, good)
+# but emimanagement.sql is NOT gitignored and contains real user rows, so it
+# would be uploaded. Declaring this file replaces the .gitignore-derived rules
+# with the explicit list below.
+#
+# Keep this roughly in sync with .dockerignore. .dockerignore governs what the
+# Docker daemon sees; this governs what leaves your machine at all.
+
+.gcloudignore
+.git
+.gitignore
+
+# --- secrets and real data ---------------------------------------------------
+.env
+.env.*
+!.env.example
+auth.json
+*.pem
+*.key
+.rnd
+emimanagement.sql
+
+# --- rebuilt inside the image ------------------------------------------------
+node_modules
+vendor
+public/build
+public/hot
+public/storage
+
+# --- local state -------------------------------------------------------------
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+storage/app/public
+storage/pail
+bootstrap/cache
+
+# --- not needed to build the image -------------------------------------------
+tests
+.phpunit.cache
+.phpunit.result.cache
+.claude
+.idea
+.vscode
+docs
