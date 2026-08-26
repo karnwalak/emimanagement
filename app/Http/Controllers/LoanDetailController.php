@@ -11,6 +11,7 @@ use App\Models\LoanDetail;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\LoanDetailRequest;
 use App\Http\Resources\LoanDetailResource;
 use Illuminate\Http\UploadedFile;
@@ -225,6 +226,8 @@ class LoanDetailController extends Controller
 
     public function update(LoanDetailRequest $request, LoanDetail $loanDetail)
     {
+        Gate::authorize('update', $loanDetail);
+
         try {
             $amount = $request->amount;
             $interestRate = $request->interest_rate;
@@ -274,6 +277,8 @@ class LoanDetailController extends Controller
 
     public function uploadDocuments(Request $request, LoanDetail $loanDetail)
     {
+        Gate::authorize('update', $loanDetail);
+
         $request->validate([
             'documents' => 'required|array',
             'documents.*.name' => 'required|string',
@@ -304,6 +309,8 @@ class LoanDetailController extends Controller
      */
     public function show(LoanDetail $loanDetail)
     {
+        Gate::authorize('view', $loanDetail);
+
         $emiDetail = $loanDetail->emiDetail;
         $user = $loanDetail->user;
         $documents = $loanDetail->documents;
@@ -315,6 +322,8 @@ class LoanDetailController extends Controller
      */
     public function edit(LoanDetail $loanDetail)
     {
+        Gate::authorize('update', $loanDetail);
+
         $emiDetail = $loanDetail->emiDetail->select('id', 'loan_detail_id', 'amount', 'due_date', 'status');
         $documents = $loanDetail->documents;
         return inertia('Edit', compact('loanDetail', 'emiDetail', 'documents'));
@@ -325,6 +334,8 @@ class LoanDetailController extends Controller
      */
     public function destroy(LoanDetail $loanDetail)
     {
+        Gate::authorize('delete', $loanDetail);
+
         if ($loanDetail) {
             $loanDetail->emiDetail()->delete();
             $loanDetail->delete();
@@ -342,6 +353,8 @@ class LoanDetailController extends Controller
         $loanDetail = LoanDetail::find($request->loan_id);
         // dd($loanDetail);
         if ($loanDetail) {
+            Gate::authorize('update', $loanDetail);
+
             $emiDetails = EmiDetail::where('loan_detail_id', $loanDetail->id)
                 ->where('status', 'pending')
                 ->update(['status' => 'paid']);
@@ -355,6 +368,8 @@ class LoanDetailController extends Controller
 
     public function destroyDocument(LoanDocument $loanDocument)
     {
+        Gate::authorize('delete', $loanDocument);
+
         // Delete file from storage
         if ($loanDocument->path && \Illuminate\Support\Facades\Storage::disk('public')->exists($loanDocument->path)) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete($loanDocument->path);

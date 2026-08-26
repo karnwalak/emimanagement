@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\EmiDetail;
 use App\Models\LoanDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class EmiDetailController extends Controller
 {
@@ -54,8 +55,12 @@ class EmiDetailController extends Controller
      */
     public function update(Request $request)
     {
-        $emiDetail = EmiDetail::find($request->id);
+        $emiDetail = EmiDetail::with('loanDetail')->find($request->id);
         if($emiDetail){
+            // EmiDetail has no owner of its own — ownership is inherited
+            // through the loan it belongs to, same as LoanDocument.
+            Gate::authorize('update', $emiDetail->loanDetail);
+
             $emiDetail->status = $request->status;
             $emiDetail->save();
 
@@ -78,9 +83,25 @@ class EmiDetailController extends Controller
     }
 
     public function updateEmi(Request $request){
-        $updateEmi = EmiDetail::upsert($request->emi_details,['id'],['amount','due_date']);
+        $loanDetail = LoanDetail::find($request->loan_detail_id);
+        abort_if(!$loanDetail, 404);
+        Gate::authorize('update', $loanDetail);
+
+        // upsert() matches existing rows on 'id' alone. Without this filter,
+        // a submitted id belonging to a different loan — including another
+        // user's — would silently have its amount/due_date overwritten,
+        // regardless of the loan_detail_id claimed elsewhere in the request.
+        $ownedIds = EmiDetail::where('loan_detail_id', $loanDetail->id)->pluck('id')->all();
+        $emiDetails = collect($request->emi_details ?? [])
+            ->filter(fn ($emi) => in_array($emi['id'] ?? null, $ownedIds, true))
+            ->values()
+            ->all();
+
+        abort_if(empty($emiDetails), 422, 'No valid EMI rows for this loan.');
+
+        $updateEmi = EmiDetail::upsert($emiDetails,['id'],['amount','due_date']);
         if($updateEmi){
-            $updatedEmi = EmiDetail::where('loan_detail_id',$request->loan_detail_id)->select('id', 'loan_detail_id', 'amount', 'due_date')->get();
+            $updatedEmi = EmiDetail::where('loan_detail_id',$loanDetail->id)->select('id', 'loan_detail_id', 'amount', 'due_date')->get();
             return response()->json(['status'=>true,'message'=>'Emi details are updated!','updatedEmi'=>$updatedEmi]);
         }
 
@@ -93,6 +114,11 @@ class EmiDetailController extends Controller
     {
         $emiId = $request->emi_id;
         $loanId = $request->loan_id;
+
+        $loanDetail = LoanDetail::find($loanId);
+        abort_if(!$loanDetail, 404);
+        Gate::authorize('update', $loanDetail);
+
         $restEmis = EmiDetail::where('id','>=',$emiId)->where('loan_detail_id',$loanId)->get();
         foreach($restEmis as $emi){
             $newDate = Carbon::parse($emi->due_date);
